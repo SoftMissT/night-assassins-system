@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Rodar testes
+        run: npm test
+
+      - name: Validar versão da tag contra o system.json
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          VERSION=$(node --input-type=module -e "import { readFileSync } from 'node:fs'; process.stdout.write(JSON.parse(readFileSync('system.json','utf8')).version)")
+          echo "tag=$TAG system.json=$VERSION"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "::error::A tag v$TAG não bate com system.json ($VERSION)"
+            exit 1
+          fi
+
+      # TODO (passo 14): compilar `packs/` e anexar um `system.zip` ao release.
+      # Enquanto isso, o release anexa só o `system.json` e o campo `download`
+      # do manifesto aponta para um `system.zip` que ainda não é gerado.
+      - name: Publicar GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" system.json \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes
