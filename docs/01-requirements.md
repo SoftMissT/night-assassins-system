@@ -22,7 +22,8 @@ prioridade definida pelo controlador.
 - **Sintaxe:** `WHEN <condição>, THE SYSTEM SHALL <comportamento>`, com
   `IF`/`WHILE` quando a fonte descrever condição ou estado.
 - **IDs:** `REQ-###` únicos, sequenciais, agrupados por categoria.
-- **Fonte:** todo requisito cita arquivo e, quando houver, versão declarada.
+- **Citação:** todo requisito cita o arquivo de origem e, quando houver, a
+  versão declarada, em uma linha dedicada iniciada por "Fonte:".
 
 ## Fontes
 
