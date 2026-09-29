@@ -1,0 +1,17 @@
+# Dependências
+node_modules/
+
+# Artefatos gerados (nunca versionados nem editados à mão)
+build/
+packs/
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Repositório legado embutido (nunca versionar)
+night-assassins-csb-automation/

@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validar versão da tag contra o system.json
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          VERSION=$(node --input-type=module -e "import { readFileSync } from 'node:fs'; process.stdout.write(JSON.parse(readFileSync('system.json','utf8')).version)")
+          echo "tag=$TAG system.json=$VERSION"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "::error::A tag v$TAG não bate com system.json ($VERSION)"
+            exit 1
+          fi
+
+      - name: Rodar testes
+        run: npm test
+
+      # TODO (Passo 14): publicar a GitHub Release anexando `system.json` E
+      # `system.zip` (com os packs compilados). O Passo 1 é apenas o esqueleto:
+      # valida a tag e roda os testes, ainda sem pack e sem publicar.
