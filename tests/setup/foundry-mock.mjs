@@ -18,6 +18,14 @@ const TRANSLATIONS = JSON.parse(
 );
 
 /**
+ * Manifesto real do sistema, para que o mock de `game.system` reflita `id` e
+ * `version` do `system.json` (um bump de versão passa a aparecer no mock).
+ */
+const MANIFEST = JSON.parse(
+  readFileSync(new URL("../../system.json", import.meta.url), "utf8"),
+);
+
+/**
  * Instala os mocks globais do Foundry.
  * @returns {{ hooks: Record<string, Function[]> }} Handlers registrados por hook.
  */
@@ -31,7 +39,10 @@ export function setupFoundryMocks() {
 
   globalThis.Hooks = {
     once(hook, handler) {
-      (hooks[hook] ??= []).push(handler);
+      const registry = (hooks[hook] ??= []);
+      if (!registry.includes(handler)) {
+        registry.push(handler);
+      }
     },
     on(hook, handler) {
       (hooks[hook] ??= []).push(handler);
@@ -44,7 +55,7 @@ export function setupFoundryMocks() {
   };
 
   globalThis.game = {
-    system: { id: "night-assassins", version: "0.1.0" },
+    system: { id: MANIFEST.id, version: MANIFEST.version },
     i18n: {
       localize: (key) => TRANSLATIONS[key] ?? key,
       format: (key, data = {}) =>

@@ -1,40 +1,48 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import { setupFoundryMocks, resetFoundryMocks } from "./setup/foundry-mock.mjs";
 
-let hooks;
+const MANIFEST = JSON.parse(
+  readFileSync(new URL("../system.json", import.meta.url), "utf8"),
+);
 
-before(() => {
+let hooks;
+let initHandler;
+
+before(async () => {
   ({ hooks } = setupFoundryMocks());
+  await import("../module/night-assassins.mjs");
+  initHandler = hooks.init?.[0];
 });
 
 after(() => {
   resetFoundryMocks();
 });
 
-test("importar o módulo registra um handler para o hook 'init'", async () => {
-  await assert.doesNotReject(
-    () => import("../module/night-assassins.mjs"),
-    "o import do módulo não deve lançar",
-  );
-
+test("importar o módulo registra um handler para o hook 'init'", () => {
   assert.ok(Array.isArray(hooks.init), "esperava handlers para o hook 'init'");
   assert.equal(hooks.init.length, 1, "esperava exatamente um handler de 'init'");
-  assert.equal(typeof hooks.init[0], "function");
+  assert.equal(typeof initHandler, "function");
 });
 
 test("o handler de 'init' loga o id e a versão do sistema", () => {
+  assert.equal(typeof initHandler, "function", "handler de 'init' não registrado");
+
   const chamadas = [];
   const original = console.log;
   console.log = (...args) => chamadas.push(args.join(" "));
   try {
-    hooks.init[0]();
+    initHandler();
   } finally {
     console.log = original;
   }
 
   assert.equal(chamadas.length, 1, "esperava um único log no init");
-  assert.match(chamadas[0], /night-assassins/, "o log deve citar o id do sistema");
-  assert.match(chamadas[0], /0\.1\.0/, "o log deve citar a versão do sistema");
+  assert.ok(chamadas[0].includes(MANIFEST.id), "o log deve citar o id do sistema");
+  assert.ok(
+    chamadas[0].includes(MANIFEST.version),
+    "o log deve citar a versão do sistema",
+  );
 });

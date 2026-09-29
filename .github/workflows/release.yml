@@ -6,7 +6,7 @@ on:
       - "v*"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   release:
@@ -16,9 +16,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-
-      - name: Rodar testes
-        run: npm test
 
       - name: Validar versão da tag contra o system.json
         run: |
@@ -30,13 +27,9 @@ jobs:
             exit 1
           fi
 
-      # TODO (passo 14): compilar `packs/` e anexar um `system.zip` ao release.
-      # Enquanto isso, o release anexa só o `system.json` e o campo `download`
-      # do manifesto aponta para um `system.zip` que ainda não é gerado.
-      - name: Publicar GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "${GITHUB_REF_NAME}" system.json \
-            --title "${GITHUB_REF_NAME}" \
-            --generate-notes
+      - name: Rodar testes
+        run: npm test
+
+      # TODO (Passo 14): publicar a GitHub Release anexando `system.json` E
+      # `system.zip` (com os packs compilados). O Passo 1 é apenas o esqueleto:
+      # valida a tag e roda os testes, ainda sem pack e sem publicar.
