@@ -473,3 +473,283 @@ THE SYSTEM SHALL separar `status_slayer_*` de `status_oni_*` e integrar Status,
 Resistência e Ferida aos hooks nativos do Combat, com um único GM autoritativo.
 
 - **Fonte:** DECISIONS.md ADR-003; specs/2026-08-07-motor-status-slayer.md
+
+## 6. Vida e Morte
+
+### REQ-052 — Queda a 0 PDV e Queda Repetida
+
+WHEN o PDV canônico do Slayer chegar a 0, THE SYSTEM SHALL entrar em "À Beira da
+Morte", incrementar as quedas do combate e aplicar as Marcas iniciais pela Queda
+Repetida (1ª queda em 0, 2ª em 1, 3ª em 2 e 4ª em morte imediata, salvo
+intervenção narrativa do GM), além dos status negativos correspondentes.
+
+- **Fonte:** specs/2026-08-11-vida-morte-automacao.md; docs/specs/life-and-death-mechanics-v1.md
+
+### REQ-053 — Teste de Morte no início do turno
+
+WHEN o turno do Slayer começar e ele não estiver estabilizado em "À Beira da
+Morte", THE SYSTEM SHALL rolar um Teste de Morte `1d20` físico sem atributo: 1
+natural desperta com `1d4 + VIT` e +1 Exaustão; 2–10 nada muda; 11–19 ganha +1
+Marca; 20 oferece Determinação Final.
+
+- **Fonte:** specs/2026-08-11-vida-morte-automacao.md
+
+### REQ-054 — Dano em 0 PDV
+
+WHEN o Slayer em "À Beira da Morte" receber dano, THE SYSTEM SHALL acrescentar
++1 Marca de Morte e, IF o dano for crítico, Dano de Ferida, decapitação ou
+execução, SHALL abrir Determinação Final ou morte.
+
+- **Fonte:** specs/2026-08-11-vida-morte-automacao.md; docs/specs/life-and-death-mechanics-v1.md
+
+### REQ-055 — Cura em 0 PDV
+
+WHEN o Slayer a 0 PDV receber cura, THE SYSTEM SHALL acordá-lo, zerar as Marcas
+de Morte, aplicar +1 Exaustão, `desequilibrado` e `sem_reacao` até o início do
+próximo turno, removendo `sem_reacao` quando a cura não vier de descanso.
+
+- **Fonte:** specs/2026-08-11-vida-morte-automacao.md; docs/specs/life-and-death-mechanics-v1.md
+
+### REQ-056 — Determinação Final
+
+THE SYSTEM SHALL executar a Determinação Final por `DialogV2` com motivo, CD
+15/18/20 ou personalizada pelo GM e Ajuda de Vínculo `+2` uma vez por combate,
+retornando com 1 PDV, +2 Exaustão e `desorientado` em sucesso, morte em 1
+natural e `1d4 + VIT` PDV com apenas +1 Exaustão em 20 natural.
+
+- **Fonte:** specs/2026-08-11-vida-morte-automacao.md
+
+### REQ-057 — Estabilização por aliado
+
+WHEN um aliado estabilizar o Slayer caído, THE SYSTEM SHALL consumir Ação Única
+e rolar `1d20 + INT ou SAB` contra CD 12, estabilizando em sucesso, removendo 1
+Marca em 20 natural e adicionando 1 Marca em 1 natural.
+
+- **Fonte:** specs/2026-08-11-vida-morte-automacao.md; docs/specs/life-and-death-mechanics-v1.md
+
+### REQ-058 — Morte direta, PDV máximo e bloqueios
+
+THE SYSTEM SHALL permitir ao GM declarar morte sem Teste pelo gerenciador,
+calcular `slayerMaxPdv = total_conta − dano_ferida + extra` e bloquear ataques,
+defesas, dano, Respiração, movimento e Reação enquanto o Slayer estiver "À Beira
+da Morte" ou morto.
+
+- **Fonte:** docs/specs/life-and-death-mechanics-v1.md; CHANGELOG.md v0.11.84 (0.8.1)
+
+### REQ-059 — Pré-condições, autoridade e exclusão do Oni
+
+WHEN o motor de Vida e Morte for acionado, THE SYSTEM SHALL exigir Slayer de
+nível 1, sete snapshots N1 positivos e PDV total positivo, reagir somente a
+mudanças relevantes, rodar apenas pelo GM primário com chaves idempotentes de
+combate/turno e manter o Oni fora deste contrato.
+
+- **Fonte:** CHANGELOG.md v0.11.84 (0.11.39, [Unreleased]); docs/specs/life-and-death-mechanics-v1.md; README.md v0.11.84
+
+## 7. Descanso
+
+### REQ-060 — Descanso de Campo
+
+WHEN o jogador escolher Descanso de Campo (2h), THE SYSTEM SHALL rolar
+`1d4 × VIT` (mínimo `1d4` com VIT 0 ou menor), recuperar até metade do PDR máximo
+sem ultrapassá-lo, restaurar o Fôlego e oferecer somente os estados leves
+permitidos.
+
+- **Fonte:** docs/specs/rest-mechanics-v1.md; CHANGELOG.md v0.11.84 (0.5.11)
+
+### REQ-061 — Descanso Completo
+
+WHEN o jogador escolher Descanso Completo (8h), THE SYSTEM SHALL restaurar PDV,
+PDR e Fôlego até o máximo e reduzir a Exaustão em 2.
+
+- **Fonte:** docs/specs/rest-mechanics-v1.md
+
+### REQ-062 — Recuperação Profunda
+
+WHEN o jogador escolher Recuperação Profunda (24h+), THE SYSTEM SHALL restaurar
+os recursos e permitir ao GM remover toda a Exaustão ou reduzi-la em 4.
+
+- **Fonte:** docs/specs/rest-mechanics-v1.md
+
+### REQ-063 — Interrupção rebaixa o benefício
+
+WHEN um descanso for interrompido antes de completar a duração, THE SYSTEM SHALL
+aplicar o rebaixamento oficial: Campo sem benefício; Completo com ao menos 2h
+vira Campo; Profunda com ao menos 8h em local seguro vira Completo.
+
+- **Fonte:** docs/specs/rest-mechanics-v1.md
+
+### REQ-064 — Confirmação do GM e registro
+
+THE SYSTEM SHALL exigir confirmação do GM primário em todo descanso (regra
+antiabuso), gravar `descanso_slayer_dados` com tipo, duração concluída, horário
+do mundo e marcador de cena, e não escrever no Actor quando não houver GM ativo,
+houver recusa, fechamento do modal ou falha de validação.
+
+- **Fonte:** docs/specs/rest-mechanics-v1.md; CHANGELOG.md v0.11.84 (0.5.11)
+
+### REQ-065 — Recuperação limitada ao máximo
+
+THE SYSTEM SHALL incrementar `pdv_slayer_curado` e `pdr_slayer_curado` com o
+valor recuperado, limitando o resultado atual ao máximo e sem remover Ferida
+automaticamente.
+
+- **Fonte:** docs/specs/rest-mechanics-v1.md
+
+### REQ-066 — Fadigas e atualização atômica
+
+THE SYSTEM SHALL remover Fadiga Corporal, Espiritual e Mental apenas em Descanso
+Completo e Recuperação Profunda (nunca no Campo), nunca remover `Ofegante` por
+descanso e gravar recursos, status e `descanso_slayer_dados` em um único
+`Actor#update`.
+
+- **Fonte:** docs/specs/rest-mechanics-v1.md
+
+## 8. Diagnóstico
+
+### REQ-067 — Captura e Journal privado do GM
+
+THE SYSTEM SHALL capturar erros atribuíveis ao Night Assassins nos clientes de
+GM e de jogadores, transmiti-los pelo socket do módulo e consolidá-los em um
+Journal visível somente para GMs.
+
+- **Fonte:** specs/2026-08-28-recuperacao-contrato-oni-e-diagnostico.md (RF-001); README.md v0.11.84
+
+### REQ-068 — Fontes capturadas
+
+THE SYSTEM SHALL capturar `Hooks.on("error")`, `window.error`,
+`unhandledrejection`, `console.error` e `console.warn`.
+
+- **Fonte:** specs/2026-08-28-recuperacao-contrato-oni-e-diagnostico.md (RF-001)
+
+### REQ-069 — Filtro por namespace
+
+THE SYSTEM SHALL aceitar somente registros relacionados ao namespace, caminho,
+macro, Compêndio ou prefixos do módulo e descartar mensagens exclusivas do core
+Foundry e de outros módulos.
+
+- **Fonte:** specs/2026-08-28-recuperacao-contrato-oni-e-diagnostico.md (RF-001); CHANGELOG.md v0.11.84 (0.11.38)
+
+### REQ-070 — Autoridade e ownership do Journal
+
+THE SYSTEM SHALL permitir que apenas o GM primário crie e atualize o Journal,
+com `ownership.default = NONE` e GMs ativos como `OWNER`.
+
+- **Fonte:** specs/2026-08-28-recuperacao-contrato-oni-e-diagnostico.md (RF-001)
+
+### REQ-071 — Conteúdo do registro e deduplicação
+
+THE SYSTEM SHALL registrar horário, usuário, Actor/token, cena, origem, mensagem,
+stack, versões e ocorrência, agrupar repetições idênticas preservando primeira
+ocorrência, última ocorrência e contador, e nunca persistir senhas, tokens de
+sessão, cookies ou conteúdo de chat privado.
+
+- **Fonte:** specs/2026-08-28-recuperacao-contrato-oni-e-diagnostico.md (RF-001)
+
+### REQ-072 — Gerenciador e exportação do diagnóstico
+
+THE SYSTEM SHALL oferecer ao GM ações para registrar erro, abrir o Journal e
+exportar todas as páginas em Markdown ou JSON usando `saveDataToFile`, incluindo
+páginas anteriores e aguardando a fila de gravação antes do download.
+
+- **Fonte:** CHANGELOG.md v0.11.84 (0.11.47); README.md v0.11.84
+
+### REQ-073 — Escape de texto narrativo
+
+THE SYSTEM SHALL escapar nomes de Actor e texto narrativo escrito pelo usuário
+antes de publicá-los em `ChatMessage`.
+
+- **Fonte:** tasks/lessons.md (lição 15); CHANGELOG.md v0.11.84 (0.9.4)
+
+## 9. Migração
+
+### REQ-074 — Actors novos e antigos preservados
+
+WHEN um mundo CSB for migrado, THE SYSTEM SHALL criar Actors novos do tipo
+correto, mover os Actors antigos para a pasta "Legado CSB" e nunca apagá-los.
+
+- **Fonte:** plans/night-assassins-system-blueprint.md (Passo 13); specs/2026-08-25-recuperacao-fichas-mundo.md
+
+### REQ-075 — Backup antes de aplicar
+
+WHEN o migrador for aplicar as alterações, THE SYSTEM SHALL exportar antes um
+backup JSON dos Actors e Items afetados.
+
+- **Fonte:** plans/night-assassins-system-blueprint.md (Passo 13)
+
+### REQ-076 — Modo dry-run
+
+THE SYSTEM SHALL oferecer modo dry-run que relata o que mudaria sem escrever
+nada.
+
+- **Fonte:** plans/night-assassins-system-blueprint.md (Passo 13)
+
+### REQ-077 — Conversão por mapping e recriação de Items
+
+WHEN migrar um Actor, THE SYSTEM SHALL converter `props` para `system.*` conforme
+`mapping.json` e recriar os Items a partir dos Compêndios, aplicando sobrescritas
+de dados.
+
+- **Fonte:** plans/night-assassins-system-blueprint.md (Passo 13)
+
+### REQ-078 — Reapontamento de tokens
+
+WHEN os Actors novos forem criados, THE SYSTEM SHALL reapontar os tokens das
+cenas para os Actors novos.
+
+- **Fonte:** plans/night-assassins-system-blueprint.md (Passo 13)
+
+### REQ-079 — Idempotência da migração
+
+WHEN o migrador rodar de novo, THE SYSTEM SHALL não duplicar Actors, Items ou
+escritas.
+
+- **Fonte:** plans/night-assassins-system-blueprint.md (Passo 13)
+
+### REQ-080 — Tipo por actor-kind e marcador de migração
+
+THE SYSTEM SHALL decidir o tipo do Actor pela lógica de `actor-kind` do legado e
+marcar `flags.night-assassins.migratedFrom` com a versão do módulo e a data.
+
+- **Fonte:** plans/night-assassins-system-blueprint.md (Passo 13); CHANGELOG.md v0.11.84 (0.11.11)
+
+### REQ-081 — Macro de migração com confirmação
+
+THE SYSTEM SHALL expor uma macro GM "Migrar mundo CSB para o sistema" com
+confirmação explícita antes de aplicar.
+
+- **Fonte:** plans/night-assassins-system-blueprint.md (Passo 13)
+
+### REQ-082 — Reidratação de dados legados
+
+WHEN um Item legado tiver IDs de template remapeados ou propriedades apagadas,
+THE SYSTEM SHALL reconhecê-lo pelos dados reais e reidratá-lo a partir do
+catálogo canônico, com reparos idempotentes.
+
+- **Fonte:** README.md v0.11.84; CHANGELOG.md v0.11.84 (0.11.53)
+
+### REQ-083 — Fronteiras de compatibilidade
+
+THE SYSTEM SHALL restringir a leitura de `system.props` a `module/migration/` e
+aos fixtures do legado, mantendo o repositório legado intocado e consultável.
+
+- **Fonte:** plans/night-assassins-system-blueprint.md (invariantes); ADR-0001
+
+## Rastreabilidade Passos × REQ
+
+Fundamentação de cada passo de implementação (3 a 14) nos requisitos acima.
+Nenhum passo fica sem ao menos um `REQ`.
+
+- **Passo 3 — Extrator de contrato dos templates CSB:** REQ-001, REQ-002, REQ-032, REQ-041, REQ-043, REQ-047
+- **Passo 4 — Classificação do contrato e inventário de fórmulas:** REQ-005, REQ-008, REQ-033, REQ-036, REQ-038
+- **Passo 5 — DataModel base e Slayer:** REQ-001, REQ-002, REQ-003, REQ-006, REQ-009
+- **Passo 6 — DataModel Oni e Oni Minion:** REQ-032, REQ-036, REQ-037, REQ-039
+- **Passo 7 — DataModel NPC e Items:** REQ-010, REQ-019, REQ-021, REQ-025, REQ-038
+- **Passo 8 — Lógica pura:** REQ-008, REQ-023, REQ-033, REQ-035, REQ-043, REQ-047, REQ-050, REQ-051
+- **Passo 9 — Serviços de combate:** REQ-011, REQ-012, REQ-013, REQ-014, REQ-016, REQ-018, REQ-022, REQ-023
+- **Passo 10a — Respirações:** REQ-024, REQ-025, REQ-026, REQ-027, REQ-028, REQ-029, REQ-030, REQ-031
+- **Passo 10b — Oni:** REQ-034, REQ-036, REQ-037, REQ-038, REQ-040
+- **Passo 10c — Dupla Alma, armas especiais e estados avançados:** REQ-023, REQ-031, REQ-046, REQ-066
+- **Passo 11 — Fichas e painéis (ApplicationV2):** REQ-001, REQ-002, REQ-006, REQ-009, REQ-040
+- **Passo 12 — Compêndios e pipeline de build:** REQ-021, REQ-025, REQ-026, REQ-037
+- **Passo 13 — Migrador de mundos CSB:** REQ-074, REQ-075, REQ-076, REQ-077, REQ-078, REQ-079, REQ-080, REQ-081, REQ-082, REQ-083
+- **Passo 14 — Piloto, release v1.0.0 e transição:** REQ-012, REQ-014, REQ-022, REQ-045, REQ-052, REQ-056, REQ-067
