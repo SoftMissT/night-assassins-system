@@ -42,13 +42,17 @@ desenvolvimento, o mesmo que roda `npm test` em CI.
 funciona no Node 24 — o runner trata argumentos posicionais como arquivos ou
 globs. Daí a forma com glob.
 
-## Verificações automatizadas (rodam a cada passo)
+## Verificações automatizadas (o que existe hoje)
 
-- `npm test` (runner `node --test`, escopo `tests/**/*.test.mjs`), todos
-  verdes, nenhum teste desativado.
+- `npm test` (runner `node --test`, escopo `tests/**/*.test.mjs`): verde, sem
+  testes desativados.
 - Parse de `system.json` e `lang/pt-BR.json`.
-- Invariantes do projeto (globals proibidos em `module/core/`, strings em
-  i18n, `system.props` só em `module/migration/`).
+
+Os demais invariantes do projeto (globals proibidos em `module/core/`, strings
+de interface em i18n, `system.props` restrito a `module/migration/`) ainda
+**não** têm teste. Eles serão convertidos em teste nos passos que os
+introduzem — o teste de invariante "sem globals em `module/core/`" entra no
+Passo 8.
 
 ## Pendências
 

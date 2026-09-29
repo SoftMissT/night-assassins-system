@@ -58,23 +58,6 @@ export function setupFoundryMocks() {
     notifications: { info: () => {}, warn: () => {}, error: () => {} },
   };
 
-  globalThis.canvas = { ready: true, tokens: { controlled: [] } };
-
-  globalThis.CONFIG = {
-    Actor: { dataModels: {} },
-    Item: { dataModels: {} },
-  };
-
-  globalThis.Roll = {
-    create: (formula) => ({ formula, evaluate: async () => ({ total: 0 }) }),
-  };
-
-  globalThis.ChatMessage = {
-    getSpeaker: ({ actor } = {}) => ({ actor: actor?.id, alias: actor?.name }),
-  };
-
-  globalThis.fromUuid = async () => null;
-
   return { hooks };
 }
 
@@ -86,10 +69,5 @@ export function resetFoundryMocks() {
   delete globalThis.Hooks;
   delete globalThis.game;
   delete globalThis.ui;
-  delete globalThis.canvas;
-  delete globalThis.CONFIG;
-  delete globalThis.Roll;
-  delete globalThis.ChatMessage;
-  delete globalThis.fromUuid;
   delete globalThis.__hooks;
 }
