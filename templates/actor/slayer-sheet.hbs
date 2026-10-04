@@ -1,0 +1,131 @@
+<div class="nas-app">
+  <header class="nas-masthead" aria-label="Night Assassins">
+    <div class="nas-masthead-ornament"></div>
+    <div class="nas-brand"><strong>NIGHT ASSASSINS</strong><small>SLAYER | FICHA DO PERSONAGEM</small></div>
+    <div class="nas-masthead-ornament"></div>
+  </header>
+
+  <div class="nas-layout">
+    <aside class="nas-identity" aria-label="Retrato e identidade">
+      <div class="nas-identity-heading">
+        <label class="nas-level">Nível <input type="number" min="1" name="system.level" value="{{system.level}}" {{#unless editable}}disabled{{/unless}}></label>
+        <div class="nas-identity-name">
+          <input aria-label="Nome do personagem" name="name" value="{{actor.name}}" {{#unless editable}}disabled{{/unless}}>
+          <span>{{system.rank}}</span>
+        </div>
+      </div>
+      <div class="nas-portrait">
+        <img src="{{actor.img}}" alt="Retrato de {{actor.name}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}}>
+        <span class="nas-portrait-edit" aria-hidden="true"><i class="fa-solid fa-image"></i> Retrato</span>
+      </div>
+      <div class="nas-portrait-quote">“A lâmina responde quando a mente se cala.”</div>
+    </aside>
+
+    <div class="nas-workspace">
+      <div class="nas-topbar">
+        <div class="nas-resource-stack" aria-label="Recursos do personagem">
+          {{#each resources}}
+            <div class="nas-resource nas-resource-{{className}}">
+              <span class="nas-resource-label">{{name}}</span>
+              <div class="nas-resource-track" role="progressbar" aria-label="{{name}}" aria-valuemin="0" aria-valuemax="{{max}}" aria-valuenow="{{value}}"><div class="nas-resource-fill" style="width:{{percent}}%"></div></div>
+              <label class="nas-resource-values"><input aria-label="{{name}} atual" type="number" min="0" name="system.resources.{{id}}.value" value="{{value}}" {{#unless ../editable}}disabled{{/unless}}> / <input aria-label="{{name}} máximo" type="number" min="0" name="system.resources.{{id}}.max" value="{{max}}" {{#unless ../editable}}disabled{{/unless}}></label>
+            </div>
+          {{/each}}
+        </div>
+        <div class="nas-section-title">
+          <i class="fa-solid {{currentTab.icon}}" aria-hidden="true"></i>
+          <div><h2>{{currentTab.name}}</h2><span>{{currentTab.subtitle}}</span></div>
+        </div>
+      </div>
+
+      <main class="nas-main">
+        {{#if tabs.personagem}}
+          <section class="nas-section">
+            <h3>ATRIBUTOS BASE <span>faixa com rolagem horizontal</span></h3>
+            <div class="nas-attribute-rail" tabindex="0" aria-label="Sete atributos do personagem, rolagem horizontal">
+              {{#each attributes}}
+                <div class="nas-attribute" style="--nas-accent:{{color}}">
+                  <label for="nas-{{id}}-{{../actor.id}}">{{name}}</label>
+                  <input id="nas-{{id}}-{{../actor.id}}" type="number" min="0" name="system.attributes.{{id}}" value="{{value}}" {{#unless ../editable}}disabled{{/unless}}>
+                  <button type="button" data-action="attribute" data-attribute="{{id}}" title="Teste: ainda não conectado">Testar <i class="fa-solid fa-dice-d20"></i></button>
+                </div>
+              {{/each}}
+            </div>
+          </section>
+          <section class="nas-section nas-two-up">
+            <div class="nas-fieldset">
+              <h3>PERSONA</h3>
+              <label>Classe
+                <select name="system.classId" {{#unless editable}}disabled{{/unless}}>
+                  <option value="">Escolher classe...</option>
+                  {{#each classes}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+                </select>
+              </label>
+              <label>Origem
+                <select name="system.originId" {{#unless editable}}disabled{{/unless}}>
+                  <option value="">Escolher origem...</option>
+                  {{#each origins}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+                </select>
+              </label>
+              <label>Rank
+                <input name="system.rank" value="{{system.rank}}" {{#unless editable}}disabled{{/unless}}>
+              </label>
+              <label>Respiração
+                <input name="system.breathing" value="{{system.breathing}}" placeholder="Definir posteriormente" {{#unless editable}}disabled{{/unless}}>
+              </label>
+            </div>
+            <div class="nas-fieldset nas-editorial"><h3>ESTADO ATUAL</h3><p>Seus dados são registrados diretamente no Actor do Foundry. Atributos, recursos, Classe e Origem devem persistir após fechar e reabrir a ficha.</p><p class="nas-muted">Automação e fórmulas ainda não vinculadas.</p></div>
+          </section>
+        {{/if}}
+
+        {{#if tabs.combate}}
+          <section class="nas-section"><h3>COMBATE E ARSENAL</h3>
+            <div class="nas-two-up"><div class="nas-fieldset"><h3>ARMA EQUIPADA</h3><p>Os modelos de Item serão integrados após validar o contrato das armas do CSB.</p><button type="button" data-action="unfinished">Arsenal (em construção)</button></div>
+            <div class="nas-fieldset"><h3>ESTILO / RESPIRAÇÃO</h3><p>{{system.breathing}}</p><button type="button" data-action="unfinished">Técnicas (em construção)</button></div></div>
+          </section>
+          <section class="nas-section"><h3>AÇÕES DE COMBATE</h3><div class="nas-action-row"><button type="button" data-action="unfinished">Ataque</button><button type="button" data-action="unfinished">Bloqueio</button><button type="button" data-action="unfinished">Esquiva</button><button type="button" data-action="unfinished">Técnica</button></div></section>
+        {{/if}}
+
+        {{#if tabs.testes}}
+          <section class="nas-section"><h3>TESTES DE ATRIBUTOS</h3>
+            <div class="nas-attribute-rail nas-attribute-rail-compact" tabindex="0" aria-label="Testes dos sete atributos">
+              {{#each attributes}}<button type="button" class="nas-attribute" style="--nas-accent:{{color}}" data-action="attribute" data-attribute="{{id}}"><span>{{name}}</span><strong>{{value}}</strong><small>Testar (pendente)</small></button>{{/each}}
+            </div>
+          </section>
+          <section class="nas-section"><h3>TESTES DE PERÍCIAS</h3><div class="nas-skill-grid">{{#each skills}}<button type="button" data-action="unfinished"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> {{this}}</button>{{/each}}</div><p class="nas-muted">Associação de atributos, proficiências e fórmulas ainda dependem do contrato validado.</p></section>
+        {{/if}}
+
+        {{#if tabs.estados}}
+          <section class="nas-section"><h3>STATUS, RESISTÊNCIAS E BÔNUS</h3><div class="nas-state-layout">
+              <div class="nas-state-actions">
+                <button type="button" data-action="unfinished">Gerenciar ações</button><button type="button" data-action="unfinished">Gerenciar resistências</button><button type="button" data-action="unfinished">Gerenciar status</button><button type="button" data-action="unfinished">Marca do Caçador</button><button type="button" data-action="unfinished">Auditar bônus</button><button type="button" data-action="unfinished">Gerenciar estados avançados</button>
+              </div>
+              <div class="nas-state-readouts"><div>Movimento · Ataque · Especial · Única · Reação <small>contadores pendentes</small></div><div>Resistências <small>não integradas</small></div><div>Status ativos <small>não integrados</small></div><div>Marca do Caçador <small>não integrada</small></div><div>Armas proficientes <small>não integradas</small></div></div>
+            </div></section>
+          <section class="nas-section"><h3>VIDA E MORTE</h3><button type="button" data-action="unfinished">Gerenciar Vida e Morte</button><p class="nas-muted">Nenhum contador de morte fictício é exibido: o modelo será definido com as regras oficiais.</p></section>
+        {{/if}}
+
+        {{#if tabs.inventario}}
+          <section class="nas-section"><h3>INVENTÁRIO E ITENS</h3><div class="nas-empty"><i class="fa-solid fa-bag-shopping"></i><strong>Itens ainda não integrados</strong><p>Itens, pesos e consumo serão conectados aos tipos nativos de Item em uma próxima etapa.</p></div></section>
+        {{/if}}
+
+        {{#if tabs.diario}}
+          <section class="nas-journal"><header class="nas-journal-title"><small>CORPORAÇÃO DOS CAÇADORES · REGISTRO PESSOAL</small><h3>JORNAL DE MISSÕES</h3><span>Edição do personagem {{actor.name}}</span></header>
+            <div class="nas-journal-columns"><article><h4>MISSÕES ATIVAS</h4><p>Nenhuma missão registrada. O modelo de missões será introduzido após a auditoria.</p><button type="button" data-action="unfinished">Adicionar missão</button></article>
+            <article><h4>ANOTAÇÕES E PISTAS</h4><p>Organize rumores, descobertas e registros de investigação. O editor persistente entra na próxima etapa.</p><button type="button" data-action="unfinished">Nova anotação</button></article></div>
+          </section>
+        {{/if}}
+
+        {{#if tabs.configuracoes}}
+          <section class="nas-section"><h3>CONFIGURAÇÕES</h3><div class="nas-fieldset"><p>Aparência, preferências, permissões e ferramentas de dados serão configuradas após validar os requisitos e níveis de acesso.</p><p class="nas-muted">A ficha já pode ser redimensionada pelo Foundry. Nenhuma operação perigosa está exposta.</p></div></section>
+        {{/if}}
+      </main>
+    </div>
+
+    <nav class="nas-navigation" aria-label="Navegação principal da ficha">
+      {{#each nav}}
+        <button type="button" class="nas-nav-item {{#if active}}is-active{{/if}}" data-action="nav" data-tab="{{id}}" aria-label="{{name}}" aria-current="{{#if active}}page{{else}}false{{/if}}"><span class="nas-nav-icon"><i class="fa-solid {{icon}}" aria-hidden="true"></i></span><span class="nas-nav-label">{{name}}</span></button>
+      {{/each}}
+    </nav>
+  </div>
+</div>

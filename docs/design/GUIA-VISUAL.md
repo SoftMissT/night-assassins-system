@@ -74,32 +74,44 @@ cabeçalho de edição. Não é um bloco de texto corrido.
 | `assets/icons/templates/` | ícones de templates de área `.webp` |
 | `assets/icons/macros/` | ícones de macros `.webp` |
 | `assets/icons/items/` | ícones de itens `.webp` |
-| `assets/` | key art `nigh assassin's.png` (único PNG) |
+| `assets/` | key art `nigh assassin's.png` |
 
-Total: 108 `.webp` + 1 `.png`.
+Total em `assets/`: 108 `.webp` + 1 `.png`.
 
-## 7. PNGs que ainda precisam ser fornecidos
+## 7. Referências visuais versionadas
 
-Só existe **um** PNG no repositório (a key art acima). Os mockups das telas
-abaixo **não existem** e não foram inventados — precisam ser enviados para que
-o layout possa ser implementado com fidelidade:
+| Caminho | Conteúdo |
+| --- | --- |
+| [`docs/design/REFERENCIAS.md`](REFERENCIAS.md) | interpretação e decisões de cada imagem + regras de UX aprovadas |
+| [`docs/design/REFERENCIAS-MOCKUPS.json`](REFERENCIAS-MOCKUPS.json) | inventário com origem, dimensões e SHA-256 de cada PNG |
+| `docs/design/references/approved/` | **7 PNG aprovados** — um por menu (01 Personagem … 07 Configurações) |
+| `docs/design/references/iterations/` | 5 PNG históricos (só contexto, não são referência de aprovação) |
 
-| # | Mockup ausente | Status |
+**Regras críticas dessas referências:**
+
+1. As imagens `approved/` são **capturas de referência**, não backgrounds nem
+   sprites — converter cada layout em HTML/Handlebars/CSS semântico.
+2. Proibido adicionar **segunda linha de abas** na região central (o único
+   rail de navegação é o da direita).
+3. **Não recortar** o key art 16:9 para servir de retrato definitivo.
+
+## 8. Lacunas que continuam abertas (não inventar)
+
+Os 7 menus já têm referência aprovada. Ainda **não existe** e não foi
+criado equivalente:
+
+| # | Lacuna | Motivo |
 | --- | --- | --- |
-| 1 | Ficha completa (painel 9:16 + rail de navegação) | **não fornecido** |
-| 2 | Barras PDV / PDR / Fôlego | **não fornecido** |
-| 3 | Fileira dos sete atributos roláveis | **não fornecido** |
-| 4 | Menu **Personagem** (Classe/Origem em dropdown) | **não fornecido** |
-| 5 | Menu **Combate** | **não fornecido** |
-| 6 | Menu **Testes** | **não fornecido** |
-| 7 | Menu **Estados** | **não fornecido** |
-| 8 | Menu **Inventário** | **não fornecido** |
-| 9 | Menu **Diário** (visual de jornal) | **não fornecido** |
-| 10 | Menu **Configurações** | **não fornecido** |
+| 1 | **Arte de retrato 9:16** para o slot `.nas-portrait` | exige arquivo artístico próprio, com licença/autorização; o key art 16:9 não pode ser deformado |
+| 2 | **Mockup final de Persona** (edição de Classe/Origem) | decisão de edição ainda não aprovada |
+| 3 | **Capturas em detalhe** das barras PDV/PDR/Fôlego e da faixa de atributos | dependem de fórmulas verificadas |
+| 4 | **Detalhes de perícias e status** | dependem do contrato extraído do legado |
 
-Enquanto esses PNGs não chegarem, a implementação usa apenas as decisões das
-seções 1–5 — nenhuma tela é imaginada a partir de referência inexistente.
+Enquanto essas referências não chegarem, a implementação usa apenas as
+seções 1–7 — nenhuma tela é imaginada a partir de referência inexistente.
 
-> **Nota:** a key art aprovada está em **16:9 paisagem**, enquanto a ficha é
-> **9:16 retrato**. Ela serve como capa/identidade, não como moldura da ficha.
-> Se houver uma versão retrato da key art, ela deve ser fornecida.
+> **Nota sobre proporção:** o slot de retrato ocupa a **coluna esquerda do
+> grid** (27% da largura) e exibirá `actor.img`. O CSS ainda **não fixa
+> `aspect-ratio: 9/16`** — pendência registrada para quando a arte 9:16
+> for fornecida. A key art 16:9 permanece como **capa/identidade**, não como
+> moldura da ficha.

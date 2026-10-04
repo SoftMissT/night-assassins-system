@@ -1,0 +1,19 @@
+{
+  "id": "night-assassins",
+  "type": "system",
+  "title": "Night Assassins",
+  "description": "Fundação nativa de Night Assassins para Foundry VTT v14. Em construção; sem automações de combate nesta etapa.",
+  "version": "0.1.0-rebirth.1",
+  "compatibility": { "minimum": "14", "verified": "14.367" },
+  "authors": [{ "name": "SoftMissT", "url": "https://github.com/SoftMissT" }],
+  "esmodules": ["module/night-assassins.mjs"],
+  "styles": ["styles/night-assassins.css"],
+  "languages": [{ "lang": "pt-BR", "name": "Português (Brasil)", "path": "lang/pt-BR.json" }],
+  "packs": [],
+  "documentTypes": { "Actor": { "slayer": {} }, "Item": {} },
+  "socket": false,
+  "relationships": { "requires": [{ "id": "dice-so-nice", "type": "module" }] },
+  "url": "https://github.com/SoftMissT/night-assassins-system",
+  "manifest": "https://github.com/SoftMissT/night-assassins-system/releases/latest/download/system.json",
+  "download": "https://github.com/SoftMissT/night-assassins-system/releases/latest/download/system.zip"
+}
