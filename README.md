@@ -14,7 +14,7 @@
 |
 [**REPORTAR ERRO**](https://github.com/SoftMissT/night-assassins-system/issues)
 |
-[**DOCUMENTAÇÃO**](.specs/)
+[**DOCUMENTAÇÃO**](plans/night-assassins-system-blueprint.md)
 </div>
 
 > [!WARNING]
@@ -31,31 +31,31 @@ Interface Dark Taishō MMORPG, com navegação
 inspirada em Sword Art Online e identidade
 visual de Night Assassins.
 
-![Ficha do personagem](.specs/design/references/approved/01-personagem-visao-geral.png)
+![Ficha do personagem](assets/references/01-personagem-visao-geral.png)
 
 ### Combate
 
-![Combate](.specs/design/references/approved/02-combate.png)
+![Combate](assets/references/02-combate.png)
 
 ### Testes e perícias
 
-![Testes](.specs/design/references/approved/03-testes-corrigido.png)
+![Testes](assets/references/03-testes-corrigido.png)
 
 ### Estados e resistências
 
-![Estados](.specs/design/references/approved/04-estados-pendente-refino.png)
+![Estados](assets/references/04-estados-pendente-refino.png)
 
 ### Inventário
 
-![Inventário](.specs/design/references/approved/05-inventario.png)
+![Inventário](assets/references/05-inventario.png)
 
 ### Diário de missões
 
-![Diário](.specs/design/references/approved/06-diario-jornal.png)
+![Diário](assets/references/06-diario-jornal.png)
 
 ### Configurações
 
-![Configurações](.specs/design/references/approved/07-configuracoes.png)
+![Configurações](assets/references/07-configuracoes.png)
 
 > As imagens acima representam designs de
 > referência. Nem todas as funções ilustradas

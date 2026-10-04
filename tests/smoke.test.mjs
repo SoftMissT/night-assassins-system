@@ -28,11 +28,19 @@ test("one rail and seven navigation routes, plus three resource bars", () => {
   assert.match(template, /name="system\.originId"/);
 });
 
-test("exactly seven principal reference screenshots and no missing files", () => {
-  const references = JSON.parse(file(".specs/design/REFERENCIAS-MOCKUPS.json"));
-  assert.equal(references.filter(x => x.group === "approved").length, 7);
-  assert.equal(references.filter(x => x.group === "iterations").length, 5);
-  for (const ref of references) assert.ok(existsSync(new URL(ref.path, base)), ref.path);
+test("exactly seven principal reference screenshots exist", () => {
+  const dir = new URL("assets/references/", base);
+  const expected = [
+    "01-personagem-visao-geral.png",
+    "02-combate.png",
+    "03-testes-corrigido.png",
+    "04-estados-pendente-refino.png",
+    "05-inventario.png",
+    "06-diario-jornal.png",
+    "07-configuracoes.png"
+  ];
+  for (const name of expected) assert.ok(existsSync(new URL(name, dir)), name);
+  assert.equal(readdirSync(dir).filter(f => f.endsWith(".png")).length, 7);
 });
 
 test("Slayer form writes system fields rather than CSB system.props", () => {

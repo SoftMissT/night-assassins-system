@@ -58,6 +58,9 @@ jobs:
             cp -R "$directory" dist/system/
           done
 
+          # mockups de design: fora do pacote Foundry
+          rm -rf dist/system/assets/references
+
           cp LICENSE README.md dist/system/
 
           node --input-type=module <<'NODE'

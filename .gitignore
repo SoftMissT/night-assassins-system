@@ -25,3 +25,6 @@ night-assassins-csb-automation/
 # dev tooling (local)
 /.claude/
 /CLAUDE.md
+
+# especificacoes locais (nao versionar)
+/.specs/
