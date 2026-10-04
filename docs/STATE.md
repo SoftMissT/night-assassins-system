@@ -4,13 +4,26 @@ Memória de sessão por feature. Atualizado ao fim de cada passo.
 
 ## Passo atual
 
-**Passo 1 — Bootstrap do repositório.** Status: **spec conforme, aguardando
-revisão.**
+**Rebirth — Missão 02.** Status: **primeira ficha Slayer nativa entregue,
+testes verdes, PR #2 em draft (sem merge).**
 
-Criação do esqueleto do Sistema Foundry v14: manifesto (`system.json`), módulo
-mínimo, i18n, mocks de teste, CI e esqueleto de release.
+A branch `rebirth/clean-slate-2026-10-03` contém agora o sistema mínimo
+Foundry v14: manifesto (`system.json` `0.1.0-rebirth.1`), `module/` (init,
+`SlayerData`, `SlayerSheet`), `templates/actor/slayer-sheet.hbs`,
+`styles/night-assassins.css`, `lang/pt-BR.json`, `package.json` e
+`tests/smoke.test.mjs`. Os 7 PNGs de referência aprovada e 5 de iteração
+estão em `docs/design/references/`.
 
-## Decisões confirmadas
+- Commit: `adef9a4` (pushado apenas na branch rebirth).
+- `npm test`: 4 pass / 0 fail.
+- Validação de API feita contra o **Foundry 14.367.0 local** (fonte do core
+  lida), **não** por execução no Foundry — ver gate manual abaixo.
+- Correção aplicada: `data-action="editImage"` movido de `<button>` para
+  `<img data-edit="img">` (o core rejeita botão).
+- Ainda **não** há tag/release/CI nesta branch; `manifest` aponta para
+  `releases/latest` inexistente.
+
+## Decisões confirmadas (herdadas do reset)
 
 - **D1:** `id` do sistema = `night-assassins`.
 - **D4:** `dice-so-nice` obrigatório em `relationships.requires` (tipo
