@@ -21,3 +21,7 @@ night-assassins-csb-automation/
 
 # ZIPs de transporte (nunca versionados)
 /*.zip
+
+# dev tooling (local)
+/.claude/
+/CLAUDE.md
