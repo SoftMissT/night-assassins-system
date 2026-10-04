@@ -1,6 +1,6 @@
 {
   "name": "night-assassins-system",
-  "version": "0.1.0-rebirth.1",
+  "version": "0.0.1",
   "type": "module",
   "private": true,
   "engines": { "node": ">=20" },

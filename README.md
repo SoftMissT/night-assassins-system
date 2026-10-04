@@ -20,8 +20,8 @@
 > [!WARNING]
 > **Em desenvolvimento.** O suporte a Foundry
 > v13.350–v14.999 é uma meta de compatibilidade,
-> ainda não integralmente validada.
-> A primeira release instalável está pendente.
+> ainda não integralmente validada — a validação
+> runtime no Foundry continua pendente.
 
 ---
 
@@ -73,14 +73,11 @@ Quando a primeira versão estável for publicada:
 4. Cole a URL do manifesto abaixo.
 5. Clique em **Install**.
 
-URL reservada para a primeira release estável:
+URL do manifesto da release mais recente:
 
 ```text
 https://github.com/SoftMissT/night-assassins-system/releases/latest/download/system.json
 ```
-
-Essa URL **não funciona antes da primeira
-release estável publicada**.
 
 ### Download direto
 

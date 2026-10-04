@@ -3,7 +3,7 @@
   "type": "system",
   "title": "Night Assassins",
   "description": "Fundação nativa de Night Assassins para Foundry VTT v14. Em construção; sem automações de combate nesta etapa.",
-  "version": "0.1.0-rebirth.1",
+  "version": "0.0.1",
   "compatibility": {
     "minimum": "14",
     "verified": "14.367"
