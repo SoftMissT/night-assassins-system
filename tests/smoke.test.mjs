@@ -1,48 +1,53 @@
-import { test, before, after } from "node:test";
+import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
 
-import { setupFoundryMocks, resetFoundryMocks } from "./setup/foundry-mock.mjs";
+const base = new URL("../", import.meta.url);
+const file = relative => readFileSync(new URL(relative, base), "utf8");
 
-const MANIFEST = JSON.parse(
-  readFileSync(new URL("../system.json", import.meta.url), "utf8"),
-);
-
-let hooks;
-let initHandler;
-
-before(async () => {
-  ({ hooks } = setupFoundryMocks());
-  await import("../module/night-assassins.mjs");
-  initHandler = hooks.init?.[0];
+// Version-neutral, safe static checks: do not require a Foundry world.
+test("manifest is a native v14 Foundry system with slayer subtype", () => {
+  const manifest = JSON.parse(file("system.json"));
+  assert.equal(manifest.id, "night-assassins");
+  assert.equal(manifest.type, "system");
+  assert.equal(manifest.compatibility.minimum, "14");
+  assert.ok(Object.hasOwn(manifest.documentTypes.Actor, "slayer"));
+  assert.ok(manifest.esmodules.every(p => existsSync(new URL(p, base))));
+  assert.ok(manifest.styles.every(p => existsSync(new URL(p, base))));
 });
 
-after(() => {
-  resetFoundryMocks();
-});
-
-test("importar o módulo registra um handler para o hook 'init'", () => {
-  assert.ok(Array.isArray(hooks.init), "esperava handlers para o hook 'init'");
-  assert.equal(hooks.init.length, 1, "esperava exatamente um handler de 'init'");
-  assert.equal(typeof initHandler, "function");
-});
-
-test("o handler de 'init' loga o id e a versão do sistema", () => {
-  assert.equal(typeof initHandler, "function", "handler de 'init' não registrado");
-
-  const chamadas = [];
-  const original = console.log;
-  console.log = (...args) => chamadas.push(args.join(" "));
-  try {
-    initHandler();
-  } finally {
-    console.log = original;
+test("one rail and seven navigation routes, plus three resource bars", () => {
+  const template = file("templates/actor/slayer-sheet.hbs");
+  const sheets = file("module/sheets/slayer-sheet.mjs");
+  assert.equal((template.match(/class="nas-navigation"/g) ?? []).length, 1);
+  for (const tab of ["personagem", "combate", "testes", "estados", "inventario", "diario", "configuracoes"]) {
+    assert.match(sheets, new RegExp(`id: "${tab}"`));
   }
+  for (const resource of ["pdv", "pdr", "folego"]) assert.match(sheets, new RegExp(`id: "${resource}"`));
+  assert.match(template, /name="system\.classId"/);
+  assert.match(template, /name="system\.originId"/);
+});
 
-  assert.equal(chamadas.length, 1, "esperava um único log no init");
-  assert.ok(chamadas[0].includes(MANIFEST.id), "o log deve citar o id do sistema");
-  assert.ok(
-    chamadas[0].includes(MANIFEST.version),
-    "o log deve citar a versão do sistema",
-  );
+test("exactly seven principal reference screenshots exist", () => {
+  const dir = new URL("assets/references/", base);
+  const expected = [
+    "01-personagem-visao-geral.png",
+    "02-combate.png",
+    "03-testes-corrigido.png",
+    "04-estados-pendente-refino.png",
+    "05-inventario.png",
+    "06-diario-jornal.png",
+    "07-configuracoes.png"
+  ];
+  for (const name of expected) assert.ok(existsSync(new URL(name, dir)), name);
+  assert.equal(readdirSync(dir).filter(f => f.endsWith(".png")).length, 7);
+});
+
+test("Slayer form writes system fields rather than CSB system.props", () => {
+  const js = file("module/data/slayer.mjs");
+  const hbs = file("templates/actor/slayer-sheet.hbs");
+  assert.ok(!js.includes("system.props"));
+  assert.ok(!hbs.includes("system.props"));
+  assert.match(hbs, /system\.resources\.\{\{id\}\}\.value/);
+  assert.match(hbs, /system\.attributes\.\{\{id\}\}/);
 });

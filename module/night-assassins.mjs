@@ -1,7 +1,12 @@
-const SYSTEM_ID = "night-assassins";
+import { SlayerData } from "./data/slayer.mjs";
+import { SlayerSheet } from "./sheets/slayer-sheet.mjs";
 
 Hooks.once("init", () => {
-  console.log(
-    `${SYSTEM_ID} | ${game.i18n.format("NAS.Init", { version: game.system.version })}`,
+  CONFIG.Actor.dataModels.slayer = SlayerData;
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(
+    foundry.documents.Actor,
+    game.system.id,
+    SlayerSheet,
+    { types: ["slayer"], makeDefault: true, label: "Night Assassins | Slayer" },
   );
 });

@@ -15,3 +15,16 @@ packs/
 
 # Repositório legado embutido (nunca versionar)
 night-assassins-csb-automation/
+
+# Memoria de sessao do agente (local, nunca versionada)
+.tang-rou/
+
+# ZIPs de transporte (nunca versionados)
+/*.zip
+
+# dev tooling (local)
+/.claude/
+/CLAUDE.md
+
+# especificacoes locais (nao versionar)
+/.specs/
