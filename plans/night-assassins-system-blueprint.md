@@ -26,6 +26,7 @@ Números lidos direto do repositório `night-assassins-csb-automation` (v0.11.84
 **Testes:** 100 arquivos em `tests/`, 173 suítes, 1088 testes passando (changelog v0.11.81), rodados com `node --test`.
 
 **Dados (templates CSB em `src/templates/actors/`):**
+
 - **Slayer:** 313 chaves únicas. 93 `numberField`, 27 `textField`, 9 `select`, 170 labels com chave (54 com fórmula).
 - **Oni:** 189 chaves únicas. 107 `numberField`, 62 labels com chave (58 com fórmula).
 - **Oni Minion:** 44 chaves únicas.
@@ -99,6 +100,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** o repo `night-assassins-system` está vazio, só com `LICENSE` (o `.gitignore` não foi criado na tela do GitHub). Precisa nascer como Sistema do Foundry v14 (`system.json`), não como módulo. O legado usa Node com `node --test` sem dependências, e o release é disparado por tag `v*`.
 
 **Tarefas:**
+
 - Criar `.gitignore` (Node, `build/`, `packs/`, `.env`, `node_modules/`).
 - Criar `package.json` (`"type": "module"`, script `test: node --test`), sem dependências de runtime.
 - Criar `system.json`: `id` (D1), `title`, `version` `0.1.0`, `compatibility` mínimo 14 e verificado 14.367 (mesmo do legado), `esmodules` apontando para `module/night-assassins.mjs`, `styles`, `languages` (pt-BR), `packs` vazio, `socket: true`, `relationships.requires` com `dice-so-nice`, URLs de `url`, `manifest` (`releases/latest/download/system.json`) e `download` do repo novo. **Antes de escrever**, consultar a doc oficial da v14 para confirmar como declarar os tipos de documento (`documentTypes` no `system.json` versus `template.json` legado) e registrar a resposta em `docs/adr/`.
@@ -122,6 +124,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** a especificação precede o código. O legado tem README e CHANGELOG detalhados (99 KB de changelog) que servem de fonte de requisitos. O autor mantém um vault Obsidian; os docs devem ser copiáveis para lá.
 
 **Tarefas:**
+
 - Criar `docs/00-constitution.md` com os princípios: lógica pura em `module/core/`; dados em `system.*` (nunca `props`); teste antes de portar; pt-BR; conteúdo gerado nunca editado à mão; nada de mecânica marcada como concluída sem gate no Foundry.
 - Criar `docs/01-requirements.md` em EARS (WHEN ... THE SYSTEM SHALL ...), com IDs `REQ-###`, extraídos do README e do CHANGELOG do legado. Agrupar por: Atributos e progressão, Combate, Respirações, Oni, Status e resistências, Vida e Morte, Descanso, Diagnóstico, Migração.
 - Criar `docs/adr/ADR-0001` (repo novo em vez de fork), `ADR-0002` (DataModel em vez de CSB), `ADR-0003` (estratégia de migração: actors novos, nunca apagar os antigos), `ADR-0004` (registro da checagem `documentTypes`).
@@ -145,6 +148,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** os templates do legado (`src/templates/actors/*.json`, 92 KB a 1,1 MB) definem os dados como componentes com `key`. Slayer tem 313 chaves únicas; Oni 189; Minion 44; NPC 55. Os scripts também leem chaves dinâmicas montadas em runtime. Este passo é mecânico: extrai fatos, não decide nada.
 
 **Tarefas:**
+
 - Copiar snapshots somente-leitura dos templates de Actor e Item do legado para `docs/legacy/csb-templates/`, com um `README.md` registrando o commit (SHA) de origem.
 - Criar `tools/extract-csb-contract.mjs` que, para cada template, percorre todos os componentes com `key` e emite: `key`, `type` do componente, valor padrão, fórmula (texto entre `${` e `}$`), caminho de aba e painel, visibilidade.
 - Criar `tools/scan-dynamic-keys.mjs` que varre `scripts/` do legado (caminho por argumento) e lista padrões dinâmicos (`props[` com template string, prefixos e sufixos como `_display`, `_resumo`, `_json`, `_estado`).
@@ -166,6 +170,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** esta é a decisão mais importante do projeto. Cada chave do CSB precisa virar campo armazenado, valor derivado, elemento só de UI, JSON de runtime ou lixo. Os labels com fórmula (54 no Slayer, 58 no Oni) escondem regras que precisam virar funções puras. Os mesmos dados alimentam o DataModel (passo 5) e o migrador (passo 13).
 
 **Tarefas:**
+
 - Para cada chave em `docs/contract/*.contract.json`, classificar: `armazenado` (campo editável), `derivado` (fórmula, `*_display`, `*_resumo`), `ui` (decorativo), `runtime-json` (`*_json`, `*_estado`, presets, marcadores de turno) ou `morto` (sem uso em script nem em fórmula).
 - Gerar `docs/contract/mapping.json`: `chaveCsb -> { tipo, caminhoSystem, tipoSchema, padrao, formulaRef }`.
 - Para cada fórmula derivada, escrever em `docs/contract/formulas.md` a regra em português e a assinatura da função pura correspondente (`module/core/derived/`), com exemplos de entrada e saída tirados das fichas exportadas.
@@ -189,6 +194,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** atributos (VIT, DEX, FOR, CAR, FDV), PDV, PDR, nível e progressão N1 a N20 são compartilhados por Slayer e Oni. O Slayer é o maior ator (313 chaves). Os DataModels devem ser registrados no hook `init` via `Object.assign(CONFIG.Actor.dataModels, {...})` para preservar propriedades estáticas.
 
 **Tarefas:**
+
 - Criar `module/data/base-actor.mjs` (schema compartilhado) e `module/data/slayer.mjs`, com `defineSchema()` a partir de `mapping.json` (só campos `armazenado` e `runtime-json`).
 - Implementar `prepareDerivedData()` chamando as funções puras de `module/core/derived/` (fórmulas do passo 4).
 - Registrar o tipo no `init` e em `system.json`.
@@ -210,6 +216,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** Oni tem 189 chaves e recursos próprios (PDK em vez de PDR, Regeneração, Origens, Kekkijutsus, Especializações). Minion é uma ficha enxuta (44 chaves) com tipos, pacotes de atributos, ataques, traços e fraquezas. Ambos herdam a base do passo 5.
 
 **Tarefas:**
+
 - Criar `module/data/oni.mjs` e `module/data/oni-minion.mjs` seguindo `mapping.json`.
 - Implementar `prepareDerivedData()` com as fórmulas do Oni (58 labels com fórmula) e do Minion.
 - Testes com fixtures Oni N1, Oni N20 e Minion.
@@ -229,6 +236,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** NPC (55 chaves) participa do relay genérico de dano e do motor de Acerto/Dano por armas normais. Os Items (arma normal, arma especial, forma de Respiração, Kekkijutsu) têm templates em `src/templates/items/` do legado; o crítico de arma vem do perfil do Item, não é fixo em 20.
 
 **Tarefas:**
+
 - Criar `module/data/npc.mjs` e os modelos de Item em `module/data/items/`.
 - Registrar em `CONFIG.Actor.dataModels` e `CONFIG.Item.dataModels`.
 - Testes com o fixture NPC e com um Item de cada tipo tirado dos templates do legado.
@@ -250,6 +258,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** só uma parte do legado é realmente pura (44 dos 69 arquivos tocam globals). Este passo leva o que pode viver em `module/core/` sem globals: `scripts/core/*` (combat-context, technique-definition, actor-transaction), os cinco `*-core.mjs` (blood-pact, dual-soul-ceremony, dual-soul-consequence, dual-soul-awakening-resistance, special-weapon-awakening), `parsing`, `status-engine`, `status-effects`, o cálculo de `level-service`, `oni/progression-engine`, os resolvedores (`origin`, `specialization`, `attribute`), `derived-bonus-service`, `actor-kind`, `constants`.
 
 **Tarefas:**
+
 - Portar cada módulo para `module/core/`, trocando toda leitura de `system.props.X` por acesso ao `system.<caminho>` conforme `mapping.json`.
 - Portar junto os testes correspondentes (mesmos casos, adaptados aos novos caminhos).
 - Adicionar o teste de invariante "sem globals em `module/core/`".
@@ -270,6 +279,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** o coração da automação. Arquivos do legado: `hit-service` (893 linhas), `damage-service` (1834), `damage-relay` e `heal-relay` (socket, aprovação do GM), `roll-service`, `damage-preset-service`, `attack-builder`, `attack-follow-up`, `weapon-service`, `resistance-service`, `status-service`, `rest-service`, `life-death-service`, `action-service`, e os diálogos (`hit-dialog`, `damage-dialog`, `roll-dialog`, `attribute-dialogs`, `damage-preset-manager`). O diálogo de dano teve várias regressões de layout (v0.11.76 a 0.11.84); a solução final foi `modal: true`, largura 720, lista de entradas com scroll interno e rodapé fixo.
 
 **Tarefas:**
+
 - Portar os serviços para `module/services/` e os diálogos para `module/apps/dialogs/` (DialogV2 / ApplicationV2), preservando o contrato de API público do legado (`rollHit`, `rollDamage` etc.) para que macros continuem chamando o mesmo nome.
 - Manter o `ActorTransaction` (commit em lote com `Promise.allSettled`).
 - Preservar as regras: crítico pelo limiar do perfil da arma; espera do Dice So Nice antes do resultado; aprovação do GM no relay quando aplicável; nenhum diálogo aninhado.
@@ -288,16 +298,19 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Modelo:** padrão; forte na revisão do 10c.
 
 **10a. Respirações**
+
 - **Contexto:** `breath-service` (2133 linhas), os serviços por Respiração (Chamas, Pedra, Névoa, Metal, Neve, Vento), os arquivos `*-data`, `breathing-defense`, `breath-passives`, `recovery-breathing-service`. Só as seis Respirações com service, teste e auditoria contra a fonte oficial entram; Água continua fora (sem service).
 - **Tarefas:** portar serviços, dados e testes; a única mecânica por Respiração são passivas e acumuladores (`resp_passivas_estado`); custo, ação, calor e crítico seguem oficiais.
 - **Critério de saída:** as seis Respirações com testes portados verdes e o painel de Respiração abrindo no Foundry.
 
 **10b. Oni**
+
 - **Contexto:** `oni/*` (kekkijutsu, regeneração, origens, especializações, minion-builder, gm-panel-data), `oni-action-service`, `oni/repair-service` (repara dados legados; avaliar se ainda faz sentido).
 - **Tarefas:** portar serviços e testes; Oni não recebe Vida e Morte de Slayer; Regeneração roda uma vez por turno (`oni_regeneracao_usada_turno`).
 - **Critério de saída:** progressão Oni N1 a N20 reproduz os fixtures.
 
 **10c. Dupla Alma, armas especiais, Pacto de Sangue e estados avançados**
+
 - **Contexto:** `dual-soul-*` (consequence-service 2427 linhas, ceremony 1285, awakening-resistance 1016), `special-weapon-*`, `blood-pact-core`, `slayer/advanced-states` (1193), `poison-user-service`, `interlude-service`. Maior bloco do legado. Armas especiais estão fora do fluxo publicado (D6).
 - **Tarefas:** portar código e testes; manter armas especiais desativadas por padrão e documentadas como não publicadas.
 - **Critério de saída:** testes portados verdes; nenhuma mecânica marcada como "concluída" sem gate.
@@ -317,6 +330,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** as fichas hoje são montadas no editor visual do CSB. No sistema próprio viram `HandlebarsApplicationMixin(ActorSheetV2)` (Actors) e `ItemSheetV2` (Items), registradas com `DocumentSheetConfig.registerSheet` no `init`. Abas do legado: Slayer tem Perícias, Combate, Habilidades e Config/Dados; Oni tem Combate e Configurações/Dados; Minion é enxuta; NPC tem dados próprios. O visual do módulo (Orbitron/Rajdhani, dourado e sangue, prefixo `na-sheet-*`) deve ser reaproveitado de `styles/na-csb-automation.css`.
 
 **Tarefas:**
+
 - Criar `NASheetBase` e as fichas de Slayer, Oni, Minion e NPC, mais as fichas de Item.
 - Migrar o CSS reaproveitando o design system, com escopo sob a classe do sistema.
 - Portar o painel do GM (PDV/PDR ao vivo) como ApplicationV2.
@@ -338,6 +352,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** os compêndios do legado são gerados por `tools/` a partir de `data/catalog-source/`, `catalogs/` e `src/templates/items/`, e empacotados com `@foundryvtt/foundryvtt-cli`. No sistema novo, os Actors são nativos, então o compêndio `templates-de-ficha` deixa de existir.
 
 **Tarefas:**
+
 - Trazer as fontes de catálogo para `packs-src/`, ajustando o formato aos DataModels de Item do passo 7.
 - Portar somente as ferramentas de `tools/` que ainda fazem sentido; registrar as descartadas.
 - Compêndios: respirações, armas dos caçadores, arte, macros (só diagnóstico e ferramentas que continuarem úteis).
@@ -358,6 +373,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** mundos existentes têm Actors do CSB com dados em `system.props` e Items embutidos remapeados pelo CSB. O tipo de um Actor no Foundry não é algo para trocar com um `update` simples; por isso a estratégia (ADR-0003) é **criar Actors novos** e nunca apagar os antigos. Os tokens em cenas apontam para `actorId`, então o migrador precisa reapontar. O tipo (slayer, oni, minion, npc) é decidido pela lógica de `actor-kind` do legado.
 
 **Tarefas:**
+
 - Criar `module/migration/csb-to-system.mjs` com modo **dry-run** (relatório do que mudaria, sem escrever nada) e modo **aplicar**.
 - Antes de aplicar, exportar um backup JSON dos Actors e Items afetados.
 - Para cada Actor: criar o novo Actor do tipo certo copiando nome, imagem, token, efeitos, pasta, propriedade e flags; converter `props` para `system.*` via `mapping.json`; recriar Items a partir dos compêndios com sobrescritas de dados; marcar `flags.<D1>.migratedFrom` com a versão do módulo e a data.
@@ -381,6 +397,7 @@ Formato de cada passo: **Depende de**, **Paralelo com**, **Modelo** (forte = rac
 **Contexto:** o legado só declara validado o que passou pelo gate no Foundry. O sistema novo segue a mesma regra. A mesa piloto usa um clone do mundo real.
 
 **Tarefas:**
+
 - Rodar os gates no clone migrado: Slayer N1 a N20; Vida e Morte do Slayer; Oni N1 a N20; fluxo Acerto, crítico, Dano com arma normal (Slayer e NPC) com Dice So Nice; gate de desempenho (sem varreduras pesadas no caminho crítico).
 - Exportar o Journal de diagnóstico e corrigir o que aparecer.
 - Fechar `release.yml` (tag, testes, packs, `system.json` e `system.zip` como assets) e publicar `v1.0.0`.
