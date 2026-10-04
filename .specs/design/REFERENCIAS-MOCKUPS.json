@@ -1,84 +1,84 @@
 [
   {
     "group": "approved",
-    "path": "docs/design/references/approved/01-personagem-visao-geral.png",
+    "path": ".specs/design/references/approved/01-personagem-visao-geral.png",
     "source": "wide_dark_fantasy_rpg_character_sheet_ui_in_a_cine.png",
     "pixels": "1586x992",
     "sha256": "07cb290fd4e1e54ff0f38cc983ee17eba46c6b65fc3c9b5ddbced8aa59efa702"
   },
   {
     "group": "approved",
-    "path": "docs/design/references/approved/02-combate.png",
+    "path": ".specs/design/references/approved/02-combate.png",
     "source": "wide_cinematic_ui_mockup_with_dark_anime_rpg_chara.png",
     "pixels": "1585x992",
     "sha256": "5974f95e252c2f91ab2cee27ff1153c91553f7759372562fb9a05bdfc651a442"
   },
   {
     "group": "approved",
-    "path": "docs/design/references/approved/03-testes-corrigido.png",
+    "path": ".specs/design/references/approved/03-testes-corrigido.png",
     "source": "ficha_de_testes_dos_assassinos_noturnos.png",
     "pixels": "1672x941",
     "sha256": "8ffe4c87e061f3dfc279489d9af77b4c4335856b84b6080d89469b3ac2b3d5d1"
   },
   {
     "group": "approved",
-    "path": "docs/design/references/approved/04-estados-pendente-refino.png",
+    "path": ".specs/design/references/approved/04-estados-pendente-refino.png",
     "source": "ficha_de_estados_do_assassino_noturno.png",
     "pixels": "1672x941",
     "sha256": "06e742d2f918b4c538bcc37f3206a97a13cdff4b42eabe0298df033ec3b0fe6c"
   },
   {
     "group": "approved",
-    "path": "docs/design/references/approved/05-inventario.png",
+    "path": ".specs/design/references/approved/05-inventario.png",
     "source": "ficha_de_inventário_do_assassino_noturno.png",
     "pixels": "1672x941",
     "sha256": "8a32f49738da7fbbd60a8fd575dbde7297b8ec714a1066abefaa71cf27fd9a91"
   },
   {
     "group": "approved",
-    "path": "docs/design/references/approved/06-diario-jornal.png",
+    "path": ".specs/design/references/approved/06-diario-jornal.png",
     "source": "diário_do_assassino_o_núcleo_corrompido.png",
     "pixels": "1672x941",
     "sha256": "5e3b5e61471a175f89c1dd83c030814c30b7acdf200fdee924cfc7802811a3c4"
   },
   {
     "group": "approved",
-    "path": "docs/design/references/approved/07-configuracoes.png",
+    "path": ".specs/design/references/approved/07-configuracoes.png",
     "source": "a_wide_detailed_ui_screenshot_of_a_dark_anime_the.png",
     "pixels": "1672x941",
     "sha256": "abc6b9a9a247b0b685fd3355fefeb092fd391024888b4c503aae0a361859db84"
   },
   {
     "group": "iterations",
-    "path": "docs/design/references/iterations/combate-estudo-01.png",
+    "path": ".specs/design/references/iterations/combate-estudo-01.png",
     "source": "a_dark_high_detail_ui_concept_art_game_characte.png",
     "pixels": "1586x992",
     "sha256": "4b6119ea51b88e901447939065c5ab4b0e0c45c7f2b79bf20094cbfc2073f3a4"
   },
   {
     "group": "iterations",
-    "path": "docs/design/references/iterations/combate-estudo-02.png",
+    "path": ".specs/design/references/iterations/combate-estudo-02.png",
     "source": "wide_dark_cinematic_ui_screenshot_game_character.png",
     "pixels": "1585x992",
     "sha256": "ec97b50362077f8cb983a323c36629ede773b1eee8f19669848094dd76628a23"
   },
   {
     "group": "iterations",
-    "path": "docs/design/references/iterations/testes-antes-da-correcao.png",
+    "path": ".specs/design/references/iterations/testes-antes-da-correcao.png",
     "source": "ficha_de_testes_do_assassino_noturno.png",
     "pixels": "1672x941",
     "sha256": "f7a3147aa43253e0b26783b2646da7b19d563fb5e5709b636cff2db6cf035130"
   },
   {
     "group": "iterations",
-    "path": "docs/design/references/iterations/diario-antes-do-jornal.png",
+    "path": ".specs/design/references/iterations/diario-antes-do-jornal.png",
     "source": "diário_do_slayer_o_núcleo_corrompido.png",
     "pixels": "1672x941",
     "sha256": "ee955e76001a44e9d9d1417d366fcc80513e4c0dc05c7404c7f0b21ff2a03f78"
   },
   {
     "group": "iterations",
-    "path": "docs/design/references/iterations/estados-rascunho.png",
+    "path": ".specs/design/references/iterations/estados-rascunho.png",
     "source": "ficha_de_personagem_night_assassins.png",
     "pixels": "1672x941",
     "sha256": "b128353ba4cd6af35f745a285e1fc7201c4aeeb716701614d7150e0062450331"

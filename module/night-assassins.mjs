@@ -7,6 +7,6 @@ Hooks.once("init", () => {
     foundry.documents.Actor,
     game.system.id,
     SlayerSheet,
-    { types: ["slayer"], makeDefault: true, label: "Night Assassins | Slayer" }
+    { types: ["slayer"], makeDefault: true, label: "Night Assassins | Slayer" },
   );
 });

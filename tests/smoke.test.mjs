@@ -29,7 +29,7 @@ test("one rail and seven navigation routes, plus three resource bars", () => {
 });
 
 test("exactly seven principal reference screenshots and no missing files", () => {
-  const references = JSON.parse(file("docs/design/REFERENCIAS-MOCKUPS.json"));
+  const references = JSON.parse(file(".specs/design/REFERENCIAS-MOCKUPS.json"));
   assert.equal(references.filter(x => x.group === "approved").length, 7);
   assert.equal(references.filter(x => x.group === "iterations").length, 5);
   for (const ref of references) assert.ok(existsSync(new URL(ref.path, base)), ref.path);

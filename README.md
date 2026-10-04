@@ -1,34 +1,122 @@
-# Night Assassins System
+<div align="center">
+<img src="assets/nigh%20assassin%27s.png" alt="Night Assassins — Capa oficial" width="900">
 
-Sistema próprio de **Night Assassins** para o Foundry Virtual Tabletop v14.
+# NIGHT ASSASSINS
+### Sistema de RPG para Foundry VTT
 
-> **Em construção.** Esta branch é o reset documentado do **Night Assassins
-> Rebirth**: existe a primeira ficha **Slayer nativa** em Foundry v14
-> (`0.1.0-rebirth.1`, testes verdes), mas **ainda não é uma release
-> instalável** — não há tag, release nem workflow de publicação. Para instalar
-> o que existia antes desta reconstrução, use o snapshot
-> [`archive/pre-rebirth-2026-10-03`](https://github.com/SoftMissT/night-assassins-system/tree/archive/pre-rebirth-2026-10-03).
+**Caçadores • Onis • Respirações • Combate • Progressão**
 
-## Onde estamos
+[![Versões](https://img.shields.io/badge/Foundry-v13.350%20a%20v14.999-red)](https://foundryvtt.com/)
+[![Licença](https://img.shields.io/badge/Licen%C3%A7a-MIT-gold)](LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-Reposit%C3%B3rio-black)](https://github.com/SoftMissT/night-assassins-system)
 
-| Documento | Conteúdo |
-| --- | --- |
-| [`docs/design/GUIA-VISUAL.md`](docs/design/GUIA-VISUAL.md) | Direção de arte e layout **aprovados** |
-| [`docs/design/REFERENCIAS.md`](docs/design/REFERENCIAS.md) | Interpretação das 7 imagens aprovadas + regras de UX |
-| [`plans/night-assassins-system-blueprint.md`](plans/night-assassins-system-blueprint.md) | Plano de construção em 14 passos |
-| `system.json`, `module/`, `templates/`, `styles/`, `lang/` | Ficha **Slayer** nativa (rascunho funcional) |
-| `tests/smoke.test.mjs` | `npm test` — 4 verificações de manifesto/layout/referências/formulário |
-| `assets/` | Key art aprovada e ícones de respiração/armas/templates/macros |
+[**RELEASES**](https://github.com/SoftMissT/night-assassins-system/releases)
+|
+[**REPORTAR ERRO**](https://github.com/SoftMissT/night-assassins-system/issues)
+|
+[**DOCUMENTAÇÃO**](.specs/)
+</div>
 
-O módulo legado construído sobre o Custom System Builder (CSB) existe apenas
-no seu disco, em `night-assassins-csb-automation/` — é **gitignored e nunca é
-versionado**.
+> [!WARNING]
+> **Em desenvolvimento.** O suporte a Foundry
+> v13.350–v14.999 é uma meta de compatibilidade,
+> ainda não integralmente validada.
+> A primeira release instalável está pendente.
 
-## Requisitos (alvo)
+---
 
-- Foundry VTT v14
-- Módulo [Dice So Nice!](https://foundryvtt.com/packages/dice-so-nice) (obrigatório em produção)
+## A ficha Slayer
 
-## Licença
+Interface Dark Taishō MMORPG, com navegação
+inspirada em Sword Art Online e identidade
+visual de Night Assassins.
 
-MIT — ver [LICENSE](LICENSE).
+![Ficha do personagem](.specs/design/references/approved/01-personagem-visao-geral.png)
+
+### Combate
+
+![Combate](.specs/design/references/approved/02-combate.png)
+
+### Testes e perícias
+
+![Testes](.specs/design/references/approved/03-testes-corrigido.png)
+
+### Estados e resistências
+
+![Estados](.specs/design/references/approved/04-estados-pendente-refino.png)
+
+### Inventário
+
+![Inventário](.specs/design/references/approved/05-inventario.png)
+
+### Diário de missões
+
+![Diário](.specs/design/references/approved/06-diario-jornal.png)
+
+### Configurações
+
+![Configurações](.specs/design/references/approved/07-configuracoes.png)
+
+> As imagens acima representam designs de
+> referência. Nem todas as funções ilustradas
+> estão implementadas na versão atual.
+
+---
+
+## Instalação
+
+Quando a primeira versão estável for publicada:
+
+1. Abra o Foundry VTT.
+2. Selecione **Game Systems**.
+3. Clique em **Install System**.
+4. Cole a URL do manifesto abaixo.
+5. Clique em **Install**.
+
+URL reservada para a primeira release estável:
+
+```text
+https://github.com/SoftMissT/night-assassins-system/releases/latest/download/system.json
+```
+
+Essa URL **não funciona antes da primeira
+release estável publicada**.
+
+### Download direto
+
+[**Última release estável**](https://github.com/SoftMissT/night-assassins-system/releases/latest)
+
+[**Todas as versões e testes**](https://github.com/SoftMissT/night-assassins-system/releases)
+
+---
+
+## Estado do desenvolvimento
+
+| Recurso | Estado |
+|---|---|
+| Ficha Slayer | Protótipo nativo |
+| PDV, PDR e Fôlego | Implementação inicial |
+| Testes e perícias | Em desenvolvimento |
+| Combate | Pendente |
+| Inventário completo | Pendente |
+| Estados e resistências | Pendente |
+| Diário interativo | Pendente |
+| Fichas Oni e NPC | Pendente |
+| Migração do CSB | Pendente |
+
+## Desenvolvimento
+
+```bash
+npm test
+```
+
+O sistema está sendo reconstruído sem
+dependência do Custom System Builder.
+
+## Autoria
+
+**SoftMissT**
+
+[GitHub](https://github.com/SoftMissT)
+
+Licença MIT. Consulte [LICENSE](LICENSE).

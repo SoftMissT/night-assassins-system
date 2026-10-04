@@ -6,22 +6,22 @@
   </header>
 
   <div class="nas-layout">
-    <aside class="nas-identity" aria-label="Retrato e identidade">
-      <div class="nas-identity-heading">
-        <label class="nas-level">Nível <input type="number" min="1" name="system.level" value="{{system.level}}" {{#unless editable}}disabled{{/unless}}></label>
-        <div class="nas-identity-name">
-          <input aria-label="Nome do personagem" name="name" value="{{actor.name}}" {{#unless editable}}disabled{{/unless}}>
-          <span>{{system.rank}}</span>
-        </div>
-      </div>
+    <aside class="nas-identity" aria-label="Retrato do personagem">
       <div class="nas-portrait">
-        <img src="{{actor.img}}" alt="Retrato de {{actor.name}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}}>
+        <img src="{{actor.img}}" alt="Retrato de {{actor.name}}" {{#if editable}}data-action="editImage" data-field="img"{{/if}}>
         <span class="nas-portrait-edit" aria-hidden="true"><i class="fa-solid fa-image"></i> Retrato</span>
       </div>
       <div class="nas-portrait-quote">“A lâmina responde quando a mente se cala.”</div>
     </aside>
 
     <div class="nas-workspace">
+      <header class="nas-workspace-header">
+        <div class="nas-workspace-name">
+          <input aria-label="Nome do personagem" name="name" value="{{actor.name}}" {{#unless editable}}disabled{{/unless}}>
+          <span>{{system.rank}}</span>
+        </div>
+        <label class="nas-seal">Nível <input type="number" min="1" name="system.level" value="{{system.level}}" {{#unless editable}}disabled{{/unless}}></label>
+      </header>
       <div class="nas-topbar">
         <div class="nas-resource-stack" aria-label="Recursos do personagem">
           {{#each resources}}
@@ -124,7 +124,7 @@
 
     <nav class="nas-navigation" aria-label="Navegação principal da ficha">
       {{#each nav}}
-        <button type="button" class="nas-nav-item {{#if active}}is-active{{/if}}" data-action="nav" data-tab="{{id}}" aria-label="{{name}}" aria-current="{{#if active}}page{{else}}false{{/if}}"><span class="nas-nav-icon"><i class="fa-solid {{icon}}" aria-hidden="true"></i></span><span class="nas-nav-label">{{name}}</span></button>
+        <button type="button" class="nas-nav-item {{#if active}}is-active{{/if}}" data-action="nav" data-tab="{{id}}" aria-label="{{name}}" aria-current="{{#if active}}page{{else}}false{{/if}}"><span class="nas-nav-icon"><i class="fa-solid {{icon}}" aria-hidden="true"></i></span><span class="nas-nav-label">{{name}}</span><span class="nas-nav-subtitle">{{subtitle}}</span></button>
       {{/each}}
     </nav>
   </div>
