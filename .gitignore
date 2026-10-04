@@ -15,3 +15,6 @@ packs/
 
 # Repositório legado embutido (nunca versionar)
 night-assassins-csb-automation/
+
+# Memoria de sessao do agente (local, nunca versionada)
+.tang-rou/
