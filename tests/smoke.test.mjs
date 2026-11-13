@@ -16,6 +16,27 @@ test("manifest is a native v14 Foundry system with slayer subtype", () => {
   assert.ok(manifest.styles.every(p => existsSync(new URL(p, base))));
 });
 
+test("bundled Cinzel font ships with its OFL license and is referenced by the stylesheet", () => {
+  const css = file("styles/night-assassins.css");
+  assert.match(css, /url\("\.\.\/assets\/fonts\/cinzel-latin\.woff2"\)/);
+  assert.ok(existsSync(new URL("assets/fonts/cinzel-latin.woff2", base)));
+  assert.match(file("assets/fonts/Cinzel-OFL.txt"), /SIL Open Font License, Version 1\.1/);
+});
+
+test("manifest media points to files that ship inside the system package", () => {
+  const manifest = JSON.parse(file("system.json"));
+  const types = manifest.media.map(m => m.type);
+  assert.ok(types.includes("setup") && types.includes("cover"));
+  const prefix = `systems/${manifest.id}/`;
+  for (const { url, thumbnail } of manifest.media) {
+    for (const path of [url, thumbnail].filter(Boolean)) {
+      assert.ok(path.startsWith(prefix), `${path} must live under ${prefix}`);
+      assert.ok(existsSync(new URL(path.slice(prefix.length), base)), `${path} missing`);
+      assert.ok(!path.includes("assets/references/"), "mockups are excluded from the release zip");
+    }
+  }
+});
+
 test("one rail and seven navigation routes, plus three resource bars", () => {
   const template = file("templates/actor/slayer-sheet.hbs");
   const sheets = file("module/sheets/slayer-sheet.mjs");

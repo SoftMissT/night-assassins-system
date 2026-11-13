@@ -3,11 +3,12 @@
     <header class="nas-identity-head">
       <label class="nas-level">
         <span>Nível</span>
-        <input type="number" min="1" name="system.level" value="{{system.level}}" aria-label="Nível" {{#unless editable}}disabled{{/unless}}>
+        <input type="number" min="0" max="14" name="system.level" value="{{system.level}}" aria-label="Nível" {{#unless gmEditable}}disabled data-tooltip="Use Subir de nível"{{/unless}}>
       </label>
       <div class="nas-name">
         <input class="nas-name-input" name="name" value="{{actor.name}}" aria-label="Nome do personagem" {{#unless editable}}disabled{{/unless}}>
-        <span class="nas-name-sub">{{identityLine}}</span>
+        <span class="nas-name-sub">{{d.patente}}{{#if identityLine}} · {{identityLine}}{{/if}}</span>
+        {{#if canLevelUp}}<button type="button" class="nas-levelup-btn" data-action="levelUp"><i class="fa-solid fa-angles-up" aria-hidden="true"></i> Subir de nível</button>{{/if}}
       </div>
     </header>
     <figure class="nas-portrait">
@@ -27,7 +28,7 @@
             <span class="nas-resource-values">
               <input aria-label="{{name}} atual" type="number" min="0" name="system.resources.{{id}}.value" value="{{value}}" {{#unless ../editable}}disabled{{/unless}}>
               <span aria-hidden="true">/</span>
-              <input aria-label="{{name}} máximo" type="number" min="0" name="system.resources.{{id}}.max" value="{{max}}" {{#unless ../editable}}disabled{{/unless}}>
+              <strong class="nas-resource-max" data-tooltip="Máximo calculado pela regra">{{#if hasMax}}{{max}}{{else}}—{{/if}}</strong>
             </span>
           </div>
         {{/each}}
@@ -39,15 +40,22 @@
     </header>
 
     <main class="nas-main">
-      {{#if tabs.personagem}}
+      {{!-- PERSONAGEM --}}
+      <section class="tab nas-tab {{tabs.personagem.cssClass}}" data-group="primary" data-tab="personagem">
+        {{#if notCreated}}
+          <section class="nas-panel nas-panel-epic nas-create-banner">
+            <div><strong>Caçador ainda não criado (nível 0)</strong><p class="nas-muted">Role os atributos, a Origem e o Dom do Sangue, escolha a Respiração e a arma. Cada rolagem vai ao chat com Dice So Nice.</p></div>
+            {{#if editable}}<button type="button" class="nas-primary" data-action="startCreation"><i class="fa-solid fa-dice" aria-hidden="true"></i> Criar personagem</button>{{/if}}
+          </section>
+        {{/if}}
         <section class="nas-panel">
-          <h3 class="nas-panel-title"><i class="fa-solid fa-khanda" aria-hidden="true"></i> Atributos base</h3>
-          <div class="nas-attribute-rail" tabindex="0" aria-label="Sete atributos do personagem">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-khanda" aria-hidden="true"></i> Atributos <span class="nas-panel-meta">total = criação + nível + Dom + temporário</span></h3>
+          <div class="nas-attribute-rail" aria-label="Sete atributos do personagem">
             {{#each attributes}}
-              <div class="nas-attribute" style="--nas-accent:{{color}}">
-                <label for="nas-{{id}}-{{../actor.id}}">{{name}}</label>
-                <input id="nas-{{id}}-{{../actor.id}}" type="number" min="0" name="system.attributes.{{id}}" value="{{value}}" {{#unless ../editable}}disabled{{/unless}}>
-                <button type="button" class="nas-die" data-action="attribute" data-attribute="{{id}}" aria-label="Testar {{name}}" data-tooltip="Testar {{name}}"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></button>
+              <div class="nas-attribute" style="--nas-accent:{{color}}" data-tooltip="{{full}}: {{sources}}">
+                <span class="nas-attr-label">{{name}}</span>
+                <strong class="nas-attr-total">{{total}}</strong>
+                <button type="button" class="nas-die" data-action="attribute" data-attribute="{{id}}" aria-label="Testar {{full}}"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></button>
               </div>
             {{/each}}
           </div>
@@ -55,190 +63,421 @@
         <div class="nas-grid nas-grid-2">
           <section class="nas-panel">
             <h3 class="nas-panel-title"><i class="fa-solid fa-user-ninja" aria-hidden="true"></i> Persona</h3>
-            <div class="nas-fields">
-              <label>Classe
-                <select name="system.classId" {{#unless editable}}disabled{{/unless}}>
-                  <option value="">Escolher classe...</option>
-                  {{#each classes}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
-                </select>
-              </label>
-              <label>Origem
-                <select name="system.originId" {{#unless editable}}disabled{{/unless}}>
-                  <option value="">Escolher origem...</option>
-                  {{#each origins}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
-                </select>
-              </label>
-              <label>Rank
-                <input name="system.rank" value="{{system.rank}}" {{#unless editable}}disabled{{/unless}}>
-              </label>
-              <label>Respiração
-                <input name="system.breathing" value="{{system.breathing}}" placeholder="Ex.: Respiração da Água" {{#unless editable}}disabled{{/unless}}>
-              </label>
-            </div>
-          </section>
-          <section class="nas-panel">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-wind" aria-hidden="true"></i> Respiração</h3>
-            {{#if system.breathing}}
-              <div class="nas-breath">
-                {{#if breathingIcon}}<img src="{{breathingIcon}}" alt="">{{/if}}
-                <div><strong>{{system.breathing}}</strong><span class="nas-muted">Formas e estágio entram com o Item de Forma.</span></div>
-              </div>
-            {{else}}
-              <div class="nas-empty"><i class="fa-solid fa-wind" aria-hidden="true"></i><strong>Nenhuma Respiração definida</strong><p>Preencha o campo Respiração em Persona.</p></div>
-            {{/if}}
-          </section>
-        </div>
-        <section class="nas-panel">
-          <h3 class="nas-panel-title"><i class="fa-solid fa-khanda" aria-hidden="true"></i> Arma equipada</h3>
-          <div class="nas-empty nas-empty-row"><i class="fa-solid fa-khanda" aria-hidden="true"></i><div><strong>Nenhuma arma equipada</strong><p>Armas aparecem aqui quando o tipo de Item de arma for criado.</p></div></div>
-        </section>
-      {{/if}}
-
-      {{#if tabs.combate}}
-        <div class="nas-stat-row">
-          {{#each combatStats}}
-            <div class="nas-stat" data-tooltip="Fórmula pendente"><i class="fa-solid {{icon}}" aria-hidden="true"></i><span>{{label}}</span><strong>—</strong></div>
-          {{/each}}
-        </div>
-        <div class="nas-grid nas-grid-2">
-          <section class="nas-panel">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-khanda" aria-hidden="true"></i> Arma equipada</h3>
-            <div class="nas-empty"><i class="fa-solid fa-khanda" aria-hidden="true"></i><strong>Nenhuma arma equipada</strong><p>Dano, alcance e durabilidade vêm do Item de arma.</p></div>
-          </section>
-          <section class="nas-panel">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-wind" aria-hidden="true"></i> Estilo / Respiração</h3>
-            {{#if system.breathing}}
-              <div class="nas-breath">
-                {{#if breathingIcon}}<img src="{{breathingIcon}}" alt="">{{/if}}
-                <div><strong>{{system.breathing}}</strong><span class="nas-muted">Estágio pendente.</span></div>
-              </div>
-            {{else}}
-              <div class="nas-empty"><i class="fa-solid fa-wind" aria-hidden="true"></i><strong>Nenhuma Respiração definida</strong></div>
-            {{/if}}
-          </section>
-        </div>
-        <div class="nas-grid nas-grid-main-side">
-          <section class="nas-panel">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-fire" aria-hidden="true"></i> Técnicas</h3>
-            <div class="nas-empty"><i class="fa-solid fa-scroll" aria-hidden="true"></i><strong>Nenhuma técnica registrada</strong><p>Formas de Respiração serão listadas com custo, alcance e dano.</p></div>
-          </section>
-          <section class="nas-panel">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Combate rápido</h3>
-            <div class="nas-quick">
-              {{#each quickActions}}<button type="button" data-action="unfinished"><i class="fa-solid {{icon}}" aria-hidden="true"></i> {{label}}</button>{{/each}}
-            </div>
-          </section>
-        </div>
-      {{/if}}
-
-      {{#if tabs.testes}}
-        <section class="nas-panel">
-          <h3 class="nas-panel-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Testes de atributos</h3>
-          <div class="nas-attribute-rail" tabindex="0" aria-label="Testes dos sete atributos">
-            {{#each attributes}}
-              <button type="button" class="nas-attribute nas-attribute-test" style="--nas-accent:{{color}}" data-action="attribute" data-attribute="{{id}}"><span class="nas-attr-label">{{name}}</span><strong>{{value}}</strong><span class="nas-attr-cta">Testar</span></button>
-            {{/each}}
-          </div>
-        </section>
-        <section class="nas-panel">
-          <h3 class="nas-panel-title"><i class="fa-solid fa-list-check" aria-hidden="true"></i> Testes de perícias</h3>
-          <div class="nas-skill-grid">
-            {{#each skills}}
-              <button type="button" class="nas-skill" data-action="unfinished" style="--nas-accent:{{color}}"><span>{{name}}</span><em>{{attrLabel}}</em></button>
-            {{/each}}
-          </div>
-          <p class="nas-muted nas-note">Proficiência e bônus entram com as regras de perícia.</p>
-        </section>
-      {{/if}}
-
-      {{#if tabs.estados}}
-        <section class="nas-panel">
-          <h3 class="nas-panel-title"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> Ações do turno</h3>
-          <div class="nas-stat-row">
-            {{#each actionSlots}}
-              <div class="nas-stat" data-tooltip="Contador pendente"><i class="fa-solid {{icon}}" aria-hidden="true"></i><span>{{label}}</span><strong>—</strong></div>
-            {{/each}}
-          </div>
-        </section>
-        <div class="nas-grid nas-grid-2">
-          <section class="nas-panel">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-shield" aria-hidden="true"></i> Status e resistências</h3>
             <dl class="nas-readouts">
-              <div><dt>Resistências</dt><dd>Não integradas</dd></div>
-              <div><dt>Status ativos</dt><dd>Não integrados</dd></div>
-              <div><dt>Marca do Caçador</dt><dd>Não integrada</dd></div>
-              <div><dt>Armas proficientes</dt><dd>Não integradas</dd></div>
-              <div><dt>Estados avançados</dt><dd>Não integrados</dd></div>
+              <div><dt>Patente</dt><dd>{{d.patente}}</dd></div>
+              <div><dt>Origem</dt><dd>{{#if originName}}{{originName}}{{#if system.creation.originMethod}} <small class="nas-muted">({{system.creation.originMethod}})</small>{{/if}}{{else}}—{{/if}}</dd></div>
+              <div><dt>Dom do Sangue</dt><dd>{{#if milestones.gift}}{{milestones.gift}}{{#if system.creation.giftMethod}} <small class="nas-muted">({{system.creation.giftMethod}})</small>{{/if}}{{else}}—{{/if}}</dd></div>
+              {{#if classShown}}<div><dt>Classe</dt><dd>{{#if className}}{{className}}{{#if d.classRank}} · Rank {{d.classRank}}{{/if}}{{else}}Escolha ao subir para o nível 4{{/if}}</dd></div>{{/if}}
+              <div><dt>Arma proficiente</dt><dd>{{#if system.proficientWeapon}}{{system.proficientWeapon}}{{else}}—{{/if}}</dd></div>
+              <div><dt>Metal e Cor</dt><dd>
+                {{#if metalUnlocked}}
+                  <select name="system.metal" {{#unless editable}}disabled{{/unless}}>
+                    <option value="">—</option>
+                    {{#each metals}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+                  </select>
+                {{else}}Recebe a Nichirin no nível 2{{/if}}
+              </dd></div>
             </dl>
           </section>
           <section class="nas-panel">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-skull" aria-hidden="true"></i> Vida e morte</h3>
-            <div class="nas-stat-row nas-stat-row-2">
-              <div class="nas-stat" data-tooltip="Regra pendente"><i class="fa-solid fa-skull" aria-hidden="true"></i><span>Marcas de morte</span><strong>— / 3</strong></div>
-              <div class="nas-stat" data-tooltip="Regra pendente"><i class="fa-solid fa-person-falling" aria-hidden="true"></i><span>Quedas no combate</span><strong>—</strong></div>
+            <h3 class="nas-panel-title"><i class="fa-solid fa-flag" aria-hidden="true"></i> Marcos do nível <span class="nas-panel-meta">Respiração nível {{milestones.breathingLevel}}</span></h3>
+            {{#if milestones.current.length}}
+              <p class="nas-subhead">Nível {{system.level}} · {{milestones.patente}}</p>
+              <ul class="nas-events">{{#each milestones.current}}<li><i class="fa-solid fa-check" aria-hidden="true"></i> {{label}}</li>{{/each}}</ul>
+            {{/if}}
+            {{#if milestones.next.length}}
+              <p class="nas-subhead">Próximo nível · {{milestones.nextPatente}}</p>
+              <ul class="nas-events nas-events-next">{{#each milestones.next}}<li><i class="fa-solid fa-lock" aria-hidden="true"></i> {{label}}</li>{{/each}}</ul>
+            {{/if}}
+            {{#if milestones.origin.length}}
+              <p class="nas-subhead">Habilidades da Origem</p>
+              <ul class="nas-events">{{#each milestones.origin}}<li class="{{#unless unlocked}}is-locked{{/unless}}"><i class="fa-solid {{#if unlocked}}fa-check{{else}}fa-lock{{/if}}" aria-hidden="true"></i> {{name}} <small class="nas-muted">nível {{level}}</small></li>{{/each}}</ul>
+            {{/if}}
+            {{#if notCreated}}<p class="nas-muted nas-note">Os marcos aparecem depois da criação.</p>{{/if}}
+          </section>
+        </div>
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-wind" aria-hidden="true"></i> Respiração</h3>
+          {{#if breathingName}}
+            <div class="nas-breath">
+              {{#if breathingIcon}}<img src="{{breathingIcon}}" alt="">{{/if}}
+              <div><strong>{{breathingName}}</strong><span class="nas-muted">Nível de Respiração {{d.breathingLevel}} · {{breathingForms.length}} Formas · use na aba Combate.</span></div>
+            </div>
+          {{else}}
+            <div class="nas-empty"><i class="fa-solid fa-wind" aria-hidden="true"></i><strong>Nenhuma Respiração definida</strong><p>A Respiração Primária é escolhida na criação.</p></div>
+          {{/if}}
+        </section>
+      </section>
+
+      {{!-- COMBATE --}}
+      <section class="tab nas-tab {{tabs.combate.cssClass}}" data-group="primary" data-tab="combate">
+        <section class="nas-panel nas-panel-compact">
+          <div class="nas-attribute-rail nas-attribute-rail-mini" aria-label="Atributos">
+            {{#each attributes}}
+              <button type="button" class="nas-attribute nas-attribute-mini" style="--nas-accent:{{color}}" data-action="attribute" data-attribute="{{id}}" data-tooltip="{{full}}: {{sources}}"><span class="nas-attr-label">{{name}}</span><strong class="nas-attr-total">{{total}}</strong></button>
+            {{/each}}
+          </div>
+        </section>
+        <div class="nas-stat-row">
+          {{#each combatStats}}
+            <button type="button" class="nas-stat nas-stat-roll" data-action="combat" data-test="{{test}}" data-tooltip="{{hint}}"><i class="fa-solid {{icon}}" aria-hidden="true"></i><span>{{label}}</span><strong>{{value}}</strong></button>
+          {{/each}}
+          <button type="button" class="nas-stat nas-stat-roll" data-action="initiative" data-tooltip="{{initiative.hint}}"><i class="fa-solid fa-angles-up" aria-hidden="true"></i><span>Iniciativa</span><strong>{{initiative.value}}</strong></button>
+        </div>
+        {{#if reminders.length}}
+          <section class="nas-panel nas-panel-compact nas-reminder-strip">
+            <span class="nas-subhead"><i class="fa-solid fa-bell" aria-hidden="true"></i> Lembretes</span>
+            {{#each reminders}}<span class="nas-reminder-chip nas-reminder-{{mode}}" data-tooltip="{{scopeLabel}} · {{summary}}">{{label}} <small>{{scopeLabel}}</small></span>{{/each}}
+          </section>
+        {{/if}}
+        <section class="nas-panel nas-weapon-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-khanda" aria-hidden="true"></i> Arma equipada</h3>
+          {{#with equippedWeapon}}
+            <div class="nas-weapon" data-item-id="{{id}}">
+              <img src="{{img}}" alt="">
+              <div class="nas-weapon-info">
+                <strong class="nas-rarity-{{rarity}}">{{name}}</strong>
+                <span class="nas-weapon-line"><b>{{damage}}</b> · crítico {{crit}}–20{{#if twoStrikes}} · 2 golpes{{/if}}{{#unless proficient}} · <em>sem proficiência</em>{{/unless}}</span>
+                {{#if profiles.[1]}}<span class="nas-chip-row">{{#each profiles}}<button type="button" class="nas-chip {{#if active}}is-active{{/if}}" data-action="setProfile" data-index="{{index}}" aria-pressed="{{#if active}}true{{else}}false{{/if}}">{{name}}</button>{{/each}}</span>{{/if}}
+              </div>
+              <button type="button" class="nas-primary nas-weapon-attack" data-action="attackWeapon"><i class="fa-solid fa-khanda" aria-hidden="true"></i> Atacar</button>
+            </div>
+          {{else}}
+            <p class="nas-muted nas-note">Nenhuma arma equipada. Equipe uma na aba Inventário; sem arma, "Ataque básico" rola só o Acerto.</p>
+          {{/with}}
+        </section>
+        <section class="nas-panel">
+          <h3 class="nas-panel-title nas-title-stack"><span><i class="fa-solid fa-fire" aria-hidden="true"></i> Técnicas</span>
+            <span class="nas-panel-meta">{{#if breathingName}}{{breathingName}} · nível {{d.breathingLevel}}{{else}}sem Respiração{{/if}}</span></h3>
+          {{#if formsMissing}}<p class="nas-muted nas-note">As Formas desta Respiração não estão no catálogo do legado; o Mestre aplica pela regra escrita.</p>{{/if}}
+          {{#if breathingForms.length}}
+            <div class="nas-table-wrap">
+              <table class="nas-table">
+                <thead><tr><th>Forma</th><th>Níveis</th><th>Ação</th><th>PDR</th><th>Dano (maior)</th><th>Efeito</th><th></th></tr></thead>
+                <tbody>
+                  {{#each breathingForms}}
+                    <tr class="{{#unless unlocked}}is-locked{{/unless}}">
+                      <td><strong>{{name}}</strong><small>{{nameJp}}</small></td>
+                      <td class="nas-num">{{levels}}</td>
+                      <td>{{action}}</td>
+                      <td class="nas-num">{{cost}}</td>
+                      <td>{{damage}}</td>
+                      <td class="nas-effect">{{effect}}</td>
+                      <td>{{#if unlocked}}<button type="button" class="nas-use" data-action="useForm" data-form="{{id}}" {{#unless affordable}}disabled data-tooltip="PDR insuficiente"{{/unless}}>Usar</button>{{else}}<small class="nas-muted">Resp. nível {{req}}</small>{{/if}}</td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          {{else}}
+            {{#unless formsMissing}}<div class="nas-empty"><i class="fa-solid fa-scroll" aria-hidden="true"></i><p>Defina a Respiração na criação para ver as Formas.</p></div>{{/unless}}
+          {{/if}}
+        </section>
+        {{#if breathingPassives.length}}
+          <section class="nas-panel nas-passives">
+            <h3 class="nas-panel-title"><i class="fa-solid fa-infinity" aria-hidden="true"></i> Passivas <span class="nas-panel-meta">sempre ativas: não gastam ação nem PDR</span></h3>
+            {{#each breathingPassives}}
+              <details class="nas-passive {{#if auto}}is-auto{{/if}}">
+                <summary>
+                  <strong>{{name}}</strong>
+                  <span class="nas-passive-tag">{{#if auto}}automática{{else}}manual{{/if}}</span>
+                  <span class="nas-passive-state">{{text}}</span>
+                  {{#if freeze}}<button type="button" class="nas-inline-btn" data-action="useFreeze" {{#unless ready}}disabled data-tooltip="Precisa de 5 acúmulos"{{/unless}} {{#unless ../editable}}disabled{{/unless}}><i class="fa-solid fa-snowflake" aria-hidden="true"></i> Congelar alvo</button>{{/if}}
+                  {{#if wind}}<button type="button" class="nas-inline-btn" data-action="windLongRest" {{#unless ../editable}}disabled{{/unless}}><i class="fa-solid fa-bed" aria-hidden="true"></i> Descanso longo</button>{{/if}}
+                </summary>
+                <div class="nas-passive-text">{{description}}</div>
+              </details>
+            {{/each}}
+          </section>
+        {{/if}}
+        <div class="nas-grid nas-grid-2">
+          <section class="nas-panel">
+            <h3 class="nas-panel-title"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Combate rápido <span class="nas-panel-meta">abre o bônus manual; Shift rola direto</span></h3>
+            <div class="nas-quick">
+              <button type="button" data-action="attackWeapon"><i class="fa-solid fa-khanda" aria-hidden="true"></i> {{#if equippedWeapon}}Atacar: {{equippedWeapon.name}}{{else}}Ataque básico{{/if}} (gasta Ataque)</button>
+              <button type="button" data-action="combat" data-test="bloqueio"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Bloqueio</button>
+              <button type="button" data-action="combat" data-test="esquiva"><i class="fa-solid fa-person-running" aria-hidden="true"></i> Esquiva</button>
+              <button type="button" data-action="rollDamageDialog"><i class="fa-solid fa-dice" aria-hidden="true"></i> Rolar dano{{#if damagePresetCount}} <small>({{damagePresetCount}} presets)</small>{{/if}}</button>
+              <button type="button" data-action="selfDamage" data-mode="damage"><i class="fa-solid fa-burst" aria-hidden="true"></i> Receber dano</button>
+              <button type="button" data-action="selfDamage" data-mode="heal"><i class="fa-solid fa-heart" aria-hidden="true"></i> Curar</button>
+            </div>
+          </section>
+          <section class="nas-panel">
+            <h3 class="nas-panel-title"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> Ações do turno <span class="nas-panel-meta">resetam no início do seu turno</span></h3>
+            <div class="nas-slot-row">
+              {{#each actionSlots}}<span class="nas-slot-chip {{#if used}}is-used{{/if}}"><i class="fa-solid {{icon}}" aria-hidden="true"></i> {{label}}</span>{{/each}}
             </div>
           </section>
         </div>
-        <div class="nas-grid nas-grid-2">
-          <section class="nas-panel nas-panel-danger">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-skull-crossbones" aria-hidden="true"></i> Condições negativas</h3>
-            <div class="nas-empty"><i class="fa-solid fa-skull-crossbones" aria-hidden="true"></i><p>Nenhuma condição negativa ativa.</p></div>
+      </section>
+
+      {{!-- TESTES --}}
+      <section class="tab nas-tab {{tabs.testes.cssClass}}" data-group="primary" data-tab="testes">
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-dice" aria-hidden="true"></i> Modo de rolagem <span class="nas-panel-meta">status Vantagem/Desvantagem ajustam sozinhos</span></h3>
+          <div class="nas-segmented" role="group" aria-label="Modo de rolagem">
+            {{#each rollModes}}<button type="button" class="{{#if active}}is-active{{/if}}" data-action="rollMode" data-mode="{{id}}" aria-pressed="{{#if active}}true{{else}}false{{/if}}">{{label}}</button>{{/each}}
+          </div>
+        </section>
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Testes de atributos <span class="nas-panel-meta">1d20 + atributo total + bônus de teste</span></h3>
+          <div class="nas-attribute-rail" aria-label="Testes dos sete atributos">
+            {{#each attributes}}
+              <button type="button" class="nas-attribute nas-attribute-test" style="--nas-accent:{{color}}" data-action="attribute" data-attribute="{{id}}" data-tooltip="{{full}}: {{sources}}"><span class="nas-attr-label">{{name}}</span><strong>{{total}}</strong><span class="nas-attr-cta">Testar</span></button>
+            {{/each}}
+          </div>
+        </section>
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-list-check" aria-hidden="true"></i> Testes de perícias <span class="nas-panel-meta">regra de mesa: 1d20 + atributo</span></h3>
+          <div class="nas-skill-grid">
+            {{#each skills}}
+              <button type="button" class="nas-skill" data-action="skill" data-skill="{{name}}" style="--nas-accent:{{color}}"><span>{{name}}</span><em>{{attrLabel}} +{{value}}</em></button>
+            {{/each}}
+          </div>
+        </section>
+      </section>
+
+      {{!-- ESTADOS --}}
+      <section class="tab nas-tab {{tabs.estados.cssClass}}" data-group="primary" data-tab="estados">
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-bell" aria-hidden="true"></i> Lembretes de bônus <span class="nas-panel-meta">aparecem marcados no diálogo da rolagem certa; os de uso limitado somem quando gastos</span></h3>
+          {{#if reminders.length}}
+            <ul class="nas-reminder-list">
+              {{#each reminders}}
+                <li class="nas-reminder-{{mode}}">
+                  <span><strong>{{label}}</strong> <small>{{scopeLabel}} · {{summary}}{{#unless isManual}} · {{source}}{{/unless}}</small></span>
+                  {{#if ../editable}}<button type="button" class="nas-icon-btn" data-action="removeReminder" data-id="{{id}}" aria-label="Remover lembrete {{label}}"><i class="fa-solid fa-xmark"></i></button>{{/if}}
+                </li>
+              {{/each}}
+            </ul>
+          {{else}}
+            <p class="nas-muted nas-note">Nenhum lembrete. Ex.: "Manobra: Vantagem no próximo acerto", "Bênção +1 em toda rolagem", "Desvantagem na próxima defesa".</p>
+          {{/if}}
+          {{#if editable}}
+            <div class="nas-reminder-form">
+              <input type="text" class="r-label" placeholder="Nome (ex.: Manobra de Combate)" aria-label="Nome do lembrete">
+              <select class="r-scope" aria-label="Onde vale">{{#each reminderScopes}}<option value="{{id}}">{{label}}</option>{{/each}}</select>
+              <select class="r-mode" aria-label="Modo">{{#each reminderModes}}<option value="{{id}}">{{label}}</option>{{/each}}</select>
+              <input type="text" class="r-bonus" placeholder="+2, -1, 1d4" aria-label="Bônus">
+              <label class="nas-reminder-uses">Usos <input type="number" class="r-uses" min="0" value="1" aria-label="Usos (0 = permanente)"></label>
+              <button type="button" class="nas-inline-btn" data-action="addReminder"><i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar</button>
+            </div>
+            <p class="nas-muted nas-note">Usos 0 = permanente até remover. Vantagem e Desvantagem se anulam com os status.</p>
+          {{/if}}
+        </section>
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> Ações do turno
+            <button type="button" class="nas-inline-btn" data-action="resetTurn" {{#unless editable}}disabled{{/unless}}><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Novo turno</button>
+          </h3>
+          <div class="nas-stat-row">
+            {{#each actionSlots}}
+              <button type="button" class="nas-stat nas-slot {{#if used}}is-used{{/if}}" data-action="toggleAction" data-key="{{key}}" aria-pressed="{{#if used}}true{{else}}false{{/if}}" {{#unless ../editable}}disabled{{/unless}}><i class="fa-solid {{icon}}" aria-hidden="true"></i><span>{{label}}</span><strong>{{#if used}}0 / 1{{else}}1 / 1{{/if}}</strong></button>
+            {{/each}}
+          </div>
+        </section>
+        <section class="nas-panel nas-panel-epic">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-crown" aria-hidden="true"></i> Ação Épica <span class="nas-panel-meta">1 por arco · tudo ou nada</span></h3>
+          <dl class="nas-readouts">
+            <div><dt>Custo</dt><dd>5 de Fôlego de Combate e um Flashback ou Memória narrado à mesa</dd></div>
+            <div><dt>Efeito</dt><dd>Recupera todo o PDR, ativa a Forma Final; o golpe é Crítico Indefensável</dd></div>
+            <div><dt>Consequência</dt><dd>Colapso Total: inconsciente com 0 PDV ou Exaustão 8</dd></div>
+            <div><dt>Neste arco</dt><dd><button type="button" class="nas-inline-btn {{#if system.epic.usedThisArc}}is-used{{/if}}" data-action="toggleEpic" {{#unless editable}}disabled{{/unless}}>{{#if system.epic.usedThisArc}}Usada{{else}}Usar Ação Épica{{/if}}</button></dd></div>
+          </dl>
+        </section>
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-skull" aria-hidden="true"></i> Vida e morte</h3>
+          <div class="nas-death">
+            <div class="nas-death-row">
+              <span class="nas-death-label">Marcas de morte</span>
+              <span class="nas-pips" aria-label="{{system.death.marks}} de 3 Marcas de Morte">{{#each deathPips}}<i class="fa-solid fa-skull {{#if on}}is-on{{/if}}" aria-hidden="true"></i>{{/each}}</span>
+              <span class="nas-stepper">
+                <button type="button" data-action="deathMark" data-delta="-1" aria-label="Remover Marca de Morte" {{#unless editable}}disabled{{/unless}}>−</button>
+                <strong>{{system.death.marks}} / 3</strong>
+                <button type="button" data-action="deathMark" data-delta="1" aria-label="Adicionar Marca de Morte" {{#unless editable}}disabled{{/unless}}>+</button>
+              </span>
+            </div>
+            <div class="nas-death-row">
+              <span class="nas-death-label">Quedas neste combate</span>
+              <span class="nas-stepper">
+                <button type="button" data-action="fall" data-delta="-1" aria-label="Remover queda" {{#unless editable}}disabled{{/unless}}>−</button>
+                <strong>{{system.death.falls}}</strong>
+                <button type="button" data-action="fall" data-delta="1" aria-label="Adicionar queda" {{#unless editable}}disabled{{/unless}}>+</button>
+              </span>
+            </div>
+            <p class="nas-muted nas-note">Dano aplicado leva a 0 PDV sozinho: entra À Beira da Morte e conta a queda (1ª = 0 Marcas, 2ª = 1, 3ª = 2, 4ª = morte).</p>
+          </div>
+        </section>
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-star-of-life" aria-hidden="true"></i> Status e condições <span class="nas-panel-meta">{{activeStatusCount}} ativos · clique para ligar/desligar (também no token)</span></h3>
+          <div class="nas-status-groups">
+            {{#each statusGroups}}
+              <div class="nas-status-group">
+                <p class="nas-subhead">{{name}}</p>
+                <div class="nas-status-chips">
+                  {{#each statuses}}<button type="button" class="nas-status {{#if on}}is-on{{/if}}" data-action="toggleStatus" data-status="{{id}}" aria-pressed="{{#if on}}true{{else}}false{{/if}}" {{#unless ../../editable}}disabled{{/unless}}><img src="{{img}}" alt=""> {{name}}</button>{{/each}}
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        </section>
+      </section>
+
+      {{!-- INVENTÁRIO --}}
+      <section class="tab nas-tab {{tabs.inventario.cssClass}}" data-group="primary" data-tab="inventario">
+        <section class="nas-panel nas-panel-compact">
+          <div class="nas-attribute-rail nas-attribute-rail-mini" aria-label="Testes de atributos">
+            {{#each attributes}}
+              <button type="button" class="nas-attribute nas-attribute-mini" style="--nas-accent:{{color}}" data-action="attribute" data-attribute="{{id}}" data-tooltip="Testar {{full}}: {{sources}}"><span class="nas-attr-label">{{name}}</span><strong class="nas-attr-total">{{total}}</strong></button>
+            {{/each}}
+          </div>
+        </section>
+        <div class="nas-inv-layout">
+          <section class="nas-panel nas-inv-list">
+            <h3 class="nas-panel-title"><i class="fa-solid fa-suitcase" aria-hidden="true"></i> Inventário
+              {{#if editable}}<span class="nas-title-actions">
+                <button type="button" class="nas-inline-btn" data-action="addCatalogWeapon"><i class="fa-solid fa-khanda" aria-hidden="true"></i> Arma do catálogo</button>
+                <button type="button" class="nas-inline-btn" data-action="createItem"><i class="fa-solid fa-plus" aria-hidden="true"></i> Novo item</button>
+              </span>{{/if}}
+            </h3>
+            <div class="nas-inv-head">
+              <label class="nas-inv-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="search" placeholder="Buscar item..." value="{{invSearch}}" aria-label="Buscar item" autocomplete="off"></label>
+              <div class="nas-inv-weight"><i class="fa-solid fa-weight-hanging" aria-hidden="true"></i>
+                <div><span>Peso total</span><strong>{{inventoryWeight}}</strong></div>
+                <div><span>Itens</span><strong>{{inventoryCount}}</strong></div>
+              </div>
+            </div>
+            <div class="nas-inv-filters" role="group" aria-label="Filtrar inventário">
+              {{#each invFilters}}<button type="button" class="{{#if active}}is-active{{/if}}" data-action="invFilter" data-filter="{{id}}" aria-pressed="{{#if active}}true{{else}}false{{/if}}">{{#if icon}}<i class="fa-solid {{icon}}" aria-hidden="true"></i> {{/if}}{{label}}</button>{{/each}}
+            </div>
+            {{#if inventory.length}}
+              <table class="nas-table nas-inv-table">
+                <thead><tr><th>Item</th><th>Tipo</th><th class="nas-num">Qtd</th><th class="nas-num">Peso</th><th class="nas-num">Ações</th></tr></thead>
+                <tbody>
+                  {{#each inventory}}
+                    <tr class="nas-inv-row {{#if selected}}is-selected{{/if}}" data-action="invSelect" data-item-id="{{id}}" data-category="{{category}}" data-name="{{searchName}}" aria-selected="{{#if selected}}true{{else}}false{{/if}}">
+                      <td><span class="nas-inv-item"><img src="{{img}}" alt=""><span class="nas-rarity-{{rarity}}">{{name}}</span>{{#if equipped}}<i class="fa-solid fa-hand-fist nas-equipped" data-tooltip="Equipado" aria-label="Equipado"></i>{{/if}}</span></td>
+                      <td><span class="nas-inv-type"><i class="fa-solid {{typeIcon}}" aria-hidden="true"></i> {{typeLabel}}</span></td>
+                      <td class="nas-num">{{quantity}}</td>
+                      <td class="nas-num">{{weight}}</td>
+                      <td class="nas-num"><span class="nas-row-actions">
+                        {{#if isWeapon}}
+                          {{#if equipped}}<button type="button" class="nas-icon-btn" data-action="attackWeapon" data-tooltip="Atacar" aria-label="Atacar com {{name}}"><i class="fa-solid fa-khanda"></i></button>
+                          {{else}}<button type="button" class="nas-icon-btn" data-action="equipItem" data-tooltip="Equipar" aria-label="Equipar {{name}}" {{#unless ../editable}}disabled{{/unless}}><i class="fa-solid fa-hand-fist"></i></button>{{/if}}
+                        {{else if usable}}<button type="button" class="nas-icon-btn" data-action="useItem" data-tooltip="Usar" aria-label="Usar {{name}}" {{#unless ../editable}}disabled{{/unless}}><i class="fa-solid fa-flask"></i></button>
+                        {{else}}<button type="button" class="nas-icon-btn" data-action="equipItem" data-tooltip="{{#if equipped}}Desequipar{{else}}Equipar{{/if}}" aria-label="Equipar {{name}}" {{#unless ../editable}}disabled{{/unless}}><i class="fa-solid fa-shield-halved"></i></button>{{/if}}
+                        <button type="button" class="nas-icon-btn" data-action="editItem" data-tooltip="Abrir ficha do item" aria-label="Abrir {{name}}"><i class="fa-solid fa-ellipsis"></i></button>
+                      </span></td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+              <p class="nas-muted nas-note nas-inv-noresult" hidden>Nada neste filtro.</p>
+            {{else}}
+              <div class="nas-empty nas-empty-large"><i class="fa-solid fa-box-open" aria-hidden="true"></i><strong>Inventário vazio</strong><p>Adicione uma arma do catálogo, crie um item ou arraste um Item da barra lateral.</p></div>
+            {{/if}}
           </section>
-          <section class="nas-panel nas-panel-calm">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-spa" aria-hidden="true"></i> Condições positivas</h3>
-            <div class="nas-empty"><i class="fa-solid fa-spa" aria-hidden="true"></i><p>Nenhuma condição positiva ativa.</p></div>
+
+          <section class="nas-panel nas-inv-details">
+            <h3 class="nas-panel-title"><i class="fa-solid fa-gem" aria-hidden="true"></i> Detalhes do item</h3>
+            {{#each inventory}}
+              <article class="nas-inv-detail" data-item-id="{{id}}" {{#unless selected}}hidden{{/unless}}>
+                <header class="nas-inv-detail-head">
+                  <img src="{{img}}" alt="">
+                  <div>
+                    <strong class="nas-rarity-{{rarity}}">{{name}}</strong>
+                    <span class="nas-muted">{{typeLabel}}{{#if equipped}} · equipado{{/if}}</span>
+                    <dl><div><dt>Quantidade</dt><dd>{{quantity}}</dd></div><div><dt>Peso</dt><dd>{{weight}}</dd></div><div><dt>Raridade</dt><dd class="nas-rarity-{{rarity}}">{{rarityLabel}}</dd></div></dl>
+                  </div>
+                </header>
+                {{#if descriptionHTML}}<div class="nas-inv-desc">{{{descriptionHTML}}}</div>{{/if}}
+                <dl class="nas-readouts nas-readouts-tight">{{#each facts}}<div><dt>{{label}}</dt><dd>{{value}}</dd></div>{{/each}}</dl>
+                {{#if ../editable}}
+                  <div class="nas-inv-buttons">
+                    {{#if isWeapon}}
+                      {{#if equipped}}<button type="button" class="nas-primary" data-action="attackWeapon"><i class="fa-solid fa-khanda" aria-hidden="true"></i> Atacar</button>{{/if}}
+                      <button type="button" class="{{#unless equipped}}nas-primary{{/unless}}" data-action="equipItem"><i class="fa-solid fa-hand-fist" aria-hidden="true"></i> {{#if equipped}}Desequipar{{else}}Equipar{{/if}}</button>
+                    {{else}}
+                      {{#if usable}}<button type="button" class="nas-primary" data-action="useItem"><i class="fa-solid fa-flask" aria-hidden="true"></i> Usar</button>{{/if}}
+                      <button type="button" data-action="equipItem"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> {{#if equipped}}Desequipar{{else}}Equipar{{/if}}</button>
+                    {{/if}}
+                    <button type="button" data-action="editItem"><i class="fa-solid fa-pen" aria-hidden="true"></i> Editar</button>
+                    <button type="button" class="nas-danger" data-action="deleteItem"><i class="fa-solid fa-trash" aria-hidden="true"></i> Descartar</button>
+                  </div>
+                {{/if}}
+              </article>
+            {{else}}
+              <div class="nas-empty"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i><p>Selecione um item.</p></div>
+            {{/each}}
           </section>
         </div>
-      {{/if}}
+      </section>
 
-      {{#if tabs.inventario}}
-        <section class="nas-panel nas-panel-fill">
-          <h3 class="nas-panel-title"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> Inventário <span class="nas-panel-meta">Peso — · Espaços —</span></h3>
-          <div class="nas-empty nas-empty-large"><i class="fa-solid fa-box-open" aria-hidden="true"></i><strong>Inventário vazio</strong><p>Armas, equipamentos, consumíveis e materiais entram com os tipos nativos de Item.</p></div>
-        </section>
-      {{/if}}
-
-      {{#if tabs.diario}}
+      {{!-- DIÁRIO --}}
+      <section class="tab nas-tab {{tabs.diario.cssClass}}" data-group="primary" data-tab="diario">
         <div class="nas-grid nas-grid-2 nas-journal">
           <section class="nas-panel nas-paper">
             <h3 class="nas-panel-title"><i class="fa-solid fa-scroll" aria-hidden="true"></i> Missões ativas</h3>
-            <div class="nas-empty"><i class="fa-solid fa-torii-gate" aria-hidden="true"></i><strong>Nenhuma missão registrada</strong><p>O registro de missões da Corporação entra numa próxima etapa.</p></div>
+            <div class="nas-empty"><i class="fa-solid fa-torii-gate" aria-hidden="true"></i><strong>Nenhuma missão registrada</strong><p>As missões ficarão num Journal compartilhado; a ficha só aponta para ele.</p></div>
           </section>
           <section class="nas-panel nas-paper">
             <h3 class="nas-panel-title"><i class="fa-solid fa-feather" aria-hidden="true"></i> Anotações do jogador</h3>
             <div class="nas-empty"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i><strong>Caderno em branco</strong><p>Pistas, rumores e anotações terão editor persistente.</p></div>
           </section>
         </div>
-      {{/if}}
+      </section>
 
-      {{#if tabs.configuracoes}}
+      {{!-- CONFIGURAÇÕES --}}
+      <section class="tab nas-tab {{tabs.configuracoes.cssClass}}" data-group="primary" data-tab="configuracoes">
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Bônus fixos <span class="nas-panel-meta">somados aos canais; o total inclui Dom e Metal</span></h3>
+          <div class="nas-bonus-grid">
+            {{#each bonusList}}
+              <label data-tooltip="{{#if sources}}{{sources}}{{else}}sem bônus{{/if}}">{{label}} <small>total {{total}}</small>
+                <input type="number" name="system.bonuses.{{id}}" value="{{fixed}}" {{#unless ../editable}}disabled{{/unless}}>
+              </label>
+            {{/each}}
+          </div>
+        </section>
         <div class="nas-grid nas-grid-2">
           <section class="nas-panel">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-id-card" aria-hidden="true"></i> Informações básicas</h3>
-            <dl class="nas-readouts">
-              <div><dt>Nome</dt><dd>{{actor.name}}</dd></div>
-              <div><dt>Nível</dt><dd>{{system.level}}</dd></div>
-              <div><dt>Classe</dt><dd>{{#if className}}{{className}}{{else}}—{{/if}}</dd></div>
-              <div><dt>Origem</dt><dd>{{#if originName}}{{originName}}{{else}}—{{/if}}</dd></div>
-              <div><dt>Rank</dt><dd>{{system.rank}}</dd></div>
-            </dl>
+            <h3 class="nas-panel-title"><i class="fa-solid fa-hourglass" aria-hidden="true"></i> Atributos temporários</h3>
+            <div class="nas-bonus-grid nas-bonus-grid-7">
+              {{#each attributes}}<label>{{name}}<input type="number" name="system.attributeBonus.{{id}}" value="{{lookup ../system.attributeBonus id}}" {{#unless ../editable}}disabled{{/unless}}></label>{{/each}}
+            </div>
+            <p class="nas-muted nas-note">Bônus de Marca, Respiração ou efeitos passageiros. Não entram no PDV/PDR.</p>
           </section>
           <section class="nas-panel">
-            <h3 class="nas-panel-title"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Versão e compatibilidade</h3>
-            <dl class="nas-readouts">
-              <div><dt>Sistema</dt><dd>Night Assassins {{versions.system}}</dd></div>
-              <div><dt>Foundry VTT</dt><dd>{{versions.core}}</dd></div>
-            </dl>
-            <p class="nas-muted nas-note">Tema, rolagens, módulos e importação/exportação ainda não estão disponíveis.</p>
+            <h3 class="nas-panel-title"><i class="fa-solid fa-user-shield" aria-hidden="true"></i> Correções do Mestre</h3>
+            {{#if gmEditable}}
+              <div class="nas-bonus-grid nas-bonus-grid-7">
+                {{#each attributes}}<label>{{name}} <small>criação</small><input type="number" min="0" name="system.attributes.{{id}}" value="{{base}}"></label>{{/each}}
+              </div>
+              <div class="nas-fields">
+                <label>Origem<select name="system.originId"><option value="">—</option>{{#each origins}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+                <label>Dom do Sangue<select name="system.gift"><option value="">—</option>{{#each gifts}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+                <label>Classe<select name="system.classId"><option value="">—</option>{{#each classes}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+                <label>Respiração<select name="system.breathing"><option value="">—</option>{{#each breathings}}<option value="{{name}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+              </div>
+              {{#each resources}}<label class="nas-inline-field">{{name}} (ajuste do máximo) <input type="number" name="system.resources.{{id}}.bonus" value="{{bonus}}"></label>{{/each}}
+            {{else}}
+              <p class="nas-muted">Só o Mestre corrige criação, Origem, Dom, Classe e Respiração.</p>
+            {{/if}}
           </section>
         </div>
-      {{/if}}
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Versão</h3>
+          <dl class="nas-readouts"><div><dt>Sistema</dt><dd>Night Assassins {{versions.system}} · Foundry {{versions.core}}</dd></div></dl>
+        </section>
+      </section>
     </main>
   </div>
 
   <nav class="nas-navigation" aria-label="Navegação principal da ficha">
-    {{#each nav}}
-      <button type="button" class="nas-nav-item {{#if active}}is-active{{/if}}" data-action="nav" data-tab="{{id}}" aria-label="{{name}}" aria-current="{{#if active}}page{{else}}false{{/if}}"><span class="nas-nav-icon"><i class="fa-solid {{icon}}" aria-hidden="true"></i></span><span class="nas-nav-text"><span class="nas-nav-label">{{name}}</span><span class="nas-nav-subtitle">{{subtitle}}</span></span></button>
-    {{/each}}
+    <div class="tabs nas-tabs-list">
+      {{#each nav}}
+        <button type="button" class="nas-nav-item {{#if active}}is-active active{{/if}}" data-action="nav" data-group="primary" data-tab="{{id}}" aria-label="{{name}}" aria-current="{{#if active}}page{{else}}false{{/if}}"><span class="nas-nav-icon"><i class="fa-solid {{icon}}" aria-hidden="true"></i></span><span class="nas-nav-text"><span class="nas-nav-label">{{name}}</span><span class="nas-nav-subtitle">{{subtitle}}</span></span></button>
+      {{/each}}
+    </div>
   </nav>
 </div>

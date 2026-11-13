@@ -6,7 +6,7 @@
 
 **Caçadores • Onis • Respirações • Combate • Progressão**
 
-[![Versões](https://img.shields.io/badge/Foundry-v13.350%20a%20v14.999-red)](https://foundryvtt.com/)
+[![Versões](https://img.shields.io/badge/Foundry-v14-red)](https://foundryvtt.com/)
 [![Licença](https://img.shields.io/badge/Licen%C3%A7a-MIT-gold)](LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-Reposit%C3%B3rio-black)](https://github.com/SoftMissT/night-assassins-system)
 
@@ -18,10 +18,11 @@
 </div>
 
 > [!WARNING]
-> **Em desenvolvimento.** O suporte a Foundry
-> v13.350–v14.999 é uma meta de compatibilidade,
-> ainda não integralmente validada — a validação
-> runtime no Foundry continua pendente.
+> **Em desenvolvimento.** Exige Foundry v14 e o
+> módulo Dice So Nice. Validado em uma instância
+> isolada do Foundry 14.367 pelo lado do Mestre;
+> a visão de jogador sem permissão de edição ainda
+> não foi exercitada.
 
 ---
 
@@ -91,12 +92,15 @@ https://github.com/SoftMissT/night-assassins-system/releases/latest/download/sys
 
 | Recurso | Estado |
 |---|---|
-| Ficha Slayer | Protótipo nativo |
-| PDV, PDR e Fôlego | Implementação inicial |
-| Testes e perícias | Em desenvolvimento |
-| Combate | Pendente |
-| Inventário completo | Pendente |
-| Estados e resistências | Pendente |
+| Ficha Slayer (7 abas) | Funcional |
+| Criação do nível 0 ao 1 e subir de nível | Funcional |
+| PDV, PDR e Fôlego por nível | Funcional |
+| Testes, perícias, bônus manual e lembretes | Funcional |
+| Formas de Respiração (níveis à escolha) | Funcional |
+| Passivas das Respirações | 5 automáticas; 19 só com o texto da regra |
+| Armas, crítico e inventário | Funcional |
+| Combate e dano com Aplicar/Metade/Curar | Funcional |
+| Estados e condições | 40 status; dano contínuo pendente |
 | Diário interativo | Pendente |
 | Fichas Oni e NPC | Pendente |
 | Migração do CSB | Pendente |

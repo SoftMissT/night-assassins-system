@@ -1,0 +1,207 @@
+{
+ "source": "legacy catalogs/slayer/progression.json",
+ "levels": {
+  "1": {
+   "patente": "Aspirante a Exterminador",
+   "breathingLevel": 1,
+   "classRank": null,
+   "events": [
+    {
+     "id": "attributes:create",
+     "label": "Criação dos atributos"
+    },
+    {
+     "id": "breathing:choose-primary",
+     "label": "Escolha da Respiração Primária"
+    },
+    {
+     "id": "weapon:choose-proficiency",
+     "label": "Escolha da arma proficiente"
+    }
+   ]
+  },
+  "2": {
+   "patente": "Mizunoto",
+   "breathingLevel": 1,
+   "classRank": null,
+   "events": [
+    {
+     "id": "selection-final:complete",
+     "label": "Conclusão da Seleção Final"
+    },
+    {
+     "id": "nichirin:receive",
+     "label": "Recebe a Nichirin (Metal e Cor)"
+    }
+   ]
+  },
+  "3": {
+   "patente": "Mizuone",
+   "breathingLevel": 1,
+   "classRank": null,
+   "events": [
+    {
+     "id": "attributes:gain-one",
+     "label": "+1 em um atributo"
+    }
+   ]
+  },
+  "4": {
+   "patente": "Kanoto",
+   "breathingLevel": 2,
+   "classRank": "C",
+   "events": [
+    {
+     "id": "class:choose",
+     "label": "Escolha da Classe/Especialização"
+    },
+    {
+     "id": "class:unlock-C",
+     "label": "Habilidade de Classe Rank C"
+    },
+    {
+     "id": "breathing:unlock-2",
+     "label": "Respiração nível 2"
+    }
+   ]
+  },
+  "5": {
+   "patente": "Kanoe",
+   "breathingLevel": 2,
+   "classRank": null,
+   "events": [
+    {
+     "id": "breathing:variation",
+     "label": "Variação de Respiração"
+    }
+   ]
+  },
+  "6": {
+   "patente": "Tsuchinoto",
+   "breathingLevel": 2,
+   "classRank": "B",
+   "events": [
+    {
+     "id": "class:unlock-B",
+     "label": "Habilidade de Classe Rank B"
+    },
+    {
+     "id": "ability:unlock-6",
+     "label": "Habilidade de Origem e marco do Dom (nível 6)"
+    }
+   ]
+  },
+  "7": {
+   "patente": "Tsuchinoe",
+   "breathingLevel": 2,
+   "classRank": null,
+   "events": [
+    {
+     "id": "attributes:gain-one",
+     "label": "+1 em um atributo"
+    },
+    {
+     "id": "transparent-world:eligible",
+     "label": "Elegível ao Mundo Transparente"
+    }
+   ]
+  },
+  "8": {
+   "patente": "Hinoto",
+   "breathingLevel": 3,
+   "classRank": "A",
+   "events": [
+    {
+     "id": "class:unlock-A",
+     "label": "Habilidade de Classe Rank A"
+    },
+    {
+     "id": "breathing:unlock-3",
+     "label": "Respiração nível 3"
+    }
+   ]
+  },
+  "9": {
+   "patente": "Hinoe",
+   "breathingLevel": 3,
+   "classRank": null,
+   "events": [
+    {
+     "id": "breathing:exclusive-technique",
+     "label": "Técnica exclusiva de Respiração"
+    }
+   ]
+  },
+  "10": {
+   "patente": "Kinoto",
+   "breathingLevel": 3,
+   "classRank": null,
+   "events": [
+    {
+     "id": "breathing:master-discovery",
+     "label": "Descoberta de Mestre (Respiração)"
+    },
+    {
+     "id": "crimson-blade:eligible",
+     "label": "Elegível à Lâmina Carmesim"
+    }
+   ]
+  },
+  "11": {
+   "patente": "Kinoe",
+   "breathingLevel": 3,
+   "classRank": "S",
+   "events": [
+    {
+     "id": "class:unlock-S",
+     "label": "Habilidade de Classe Rank S"
+    },
+    {
+     "id": "altruistic-state:eligible",
+     "label": "Elegível ao Estado Altruísta"
+    }
+   ]
+  },
+  "12": {
+   "patente": "Hashira Novato",
+   "breathingLevel": 4,
+   "classRank": "SS",
+   "events": [
+    {
+     "id": "class:unlock-SS",
+     "label": "Habilidade de Classe Rank SS"
+    },
+    {
+     "id": "breathing:unlock-4",
+     "label": "Respiração nível 4"
+    },
+    {
+     "id": "ability:unlock-12",
+     "label": "Marco do Dom (nível 12)"
+    }
+   ]
+  },
+  "13": {
+   "patente": "Hashira Experiente",
+   "breathingLevel": 4,
+   "classRank": null,
+   "events": [
+    {
+     "id": "breathing:creative-versatility",
+     "label": "Versatilidade criativa (Respiração)"
+    }
+   ]
+  },
+  "14": {
+   "patente": "Hashira de Elite",
+   "breathingLevel": 4,
+   "classRank": null,
+   "events": [
+    {
+     "id": "mark:higher-power",
+     "label": "Poder superior da Marca"
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,156 @@
+<div class="nas-wizard-body">
+  <ol class="nas-steps" aria-label="Etapas da criação">
+    {{#each steps}}<li class="{{#if active}}is-active{{/if}} {{#if done}}is-done{{/if}}"><span>{{n}}</span>{{label}}</li>{{/each}}
+  </ol>
+
+  <section class="nas-wizard-step">
+    {{#if isStep.[0]}}
+      <h3 class="nas-panel-title"><i class="fa-solid fa-dice-d6" aria-hidden="true"></i> Atributos do nível 1</h3>
+      <div class="nas-method-row" role="group" aria-label="Método">
+        <button type="button" class="{{#if (eq s.method 'standard')}}is-active{{/if}}" data-action="method" data-method="standard"><strong>Valores padrão</strong><small>{{standardPool}}</small></button>
+        <button type="button" class="{{#if (eq s.method 'roll')}}is-active{{/if}}" data-action="method" data-method="roll"><strong>Rolar 7d4</strong><small>até 3 tentativas; a 3ª é obrigatória</small></button>
+        <button type="button" class="{{#if (eq s.method 'discord')}}is-active{{/if}}" data-action="method" data-method="discord"><strong>Valores do Discord</strong><small>sete números ≥ 1</small></button>
+      </div>
+
+      {{#if (eq s.method "roll")}}
+        <div class="nas-attempts">
+          {{#each attempts}}
+            <div class="nas-attempt {{#if chosen}}is-chosen{{/if}}">
+              <span>{{n}}ª rolagem</span><strong>{{text}}</strong>
+              {{#if usable}}<button type="button" data-action="usePool" data-attempt="{{n}}">Usar esta</button>{{else}}{{#if chosen}}<em>em uso</em>{{/if}}{{/if}}
+            </div>
+          {{/each}}
+          {{#if canRollPool}}<button type="button" class="nas-primary" data-action="rollPool"><i class="fa-solid fa-dice" aria-hidden="true"></i> Rolar 7d4 ({{attemptsLeft}} restantes)</button>{{/if}}
+          {{#if s.busy}}<p class="nas-muted">Rolando…</p>{{/if}}
+        </div>
+      {{/if}}
+
+      {{#if (eq s.method "discord")}}
+        <div class="nas-discord">
+          <textarea name="discord" rows="2" placeholder="4, 3, 2, 2, 1, 1, 1">{{s.discordRaw}}</textarea>
+          <span class="nas-discord-counter" data-ok="{{discord.ok}}">{{discord.text}}</span>
+          <button type="button" data-action="useDiscord">Usar valores</button>
+        </div>
+      {{/if}}
+
+      {{#if distribution}}
+        <p class="nas-muted nas-note">Valores: <strong>{{poolText}}</strong>. Cada valor vai para um atributo diferente; o que já foi usado sai da lista.</p>
+        <div class="nas-distribution">
+          {{#each distribution}}
+            <label><span>{{label}}</span>
+              <select data-slot="{{id}}">
+                <option value="">—</option>
+                {{#each options}}<option value="{{idx}}" {{#if selected}}selected{{/if}}>{{v}}</option>{{/each}}
+              </select>
+            </label>
+          {{/each}}
+        </div>
+      {{/if}}
+    {{/if}}
+
+    {{#if isStep.[1]}}
+      <h3 class="nas-panel-title"><i class="fa-solid fa-torii-gate" aria-hidden="true"></i> Origem</h3>
+      <div class="nas-roll-or-choose">
+        {{#if originCanRoll}}<button type="button" class="nas-primary" data-action="rollOrigin"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> {{originRollLabel}}</button>{{/if}}
+        {{#if originRolls.length}}<span class="nas-chances">d12: {{#each originRolls}}<strong>{{this}}</strong>{{#unless @last}} → {{/unless}}{{/each}} · {{originRollsLeft}} chance(s) restante(s)</span>{{/if}}
+        {{#if originChoosable}}
+          <label>Escolher <small>(o Mestre deixou)</small>
+            <select name="originChoice">
+              <option value="">—</option>
+              {{#each originChoices}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+            </select>
+          </label>
+        {{else}}
+          <button type="button" data-action="askOrigin"><i class="fa-solid fa-hand" aria-hidden="true"></i> O Mestre deixou escolher?</button>
+        {{/if}}
+      </div>
+      <p class="nas-muted nas-note">2 chances: se não gostar da 1ª, role de novo; a 2ª vale.</p>
+      {{#if origin}}
+        <dl class="nas-readouts">
+          <div><dt>Origem</dt><dd><strong>{{origin.name}}</strong> ({{lookup methodText s.originMethod}})</dd></div>
+          <div><dt>PDV / PDR</dt><dd>{{origin.pdv}} + VIT por nível · {{origin.pdr}} + FDV no nível 1</dd></div>
+          <div><dt>Habilidade nível 1</dt><dd>{{origin.hab1}}</dd></div>
+          <div><dt>Habilidade nível 6</dt><dd>{{origin.hab6}}</dd></div>
+        </dl>
+      {{/if}}
+    {{/if}}
+
+    {{#if isStep.[2]}}
+      <h3 class="nas-panel-title"><i class="fa-solid fa-droplet" aria-hidden="true"></i> Dom do Sangue</h3>
+      <div class="nas-roll-or-choose">
+        <button type="button" class="nas-primary" data-action="rollGift" {{#if (eq s.giftMethod "rolado")}}disabled{{/if}} {{#if s.busy}}disabled{{/if}}><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Rolar {{giftDice}}d100 (fica o maior)</button>
+        {{#if isGM}}
+          <button type="button" data-action="toggleAncient" class="{{#if s.ancientBlood}}is-active{{/if}}" {{#if (eq s.giftMethod "rolado")}}disabled{{/if}}>Sangue antigo: {{#if s.ancientBlood}}sim{{else}}não{{/if}}</button>
+        {{/if}}
+        {{#if giftChoosable}}
+          <label>Escolher <small>(o Mestre deixou)</small>
+            <select name="giftChoice" {{#if (eq s.giftMethod "rolado")}}disabled{{/if}}>
+              <option value="">—</option>
+              {{#each giftChoices}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+            </select>
+          </label>
+        {{else}}
+          <button type="button" data-action="askGift" {{#if (eq s.giftMethod "rolado")}}disabled{{/if}}><i class="fa-solid fa-hand" aria-hidden="true"></i> O Mestre deixou escolher?</button>
+        {{/if}}
+      </div>
+      <p class="nas-muted nas-note">2d100 por padrão; 3d100 para Descendente Perdido ou sangue antigo (decisão do Mestre). "Sem Habilidade" é resultado válido.</p>
+      {{#if gift}}
+        <dl class="nas-readouts">
+          <div><dt>Dom</dt><dd>{{#if s.giftRolls.length}}{{#each s.giftRolls}}{{this}} {{/each}}→ {{/if}}<strong>{{gift.name}}</strong> ({{gift.range}}, {{lookup methodText s.giftMethod}})</dd></div>
+        </dl>
+      {{/if}}
+      {{#if needGiftAttr}}
+        <label class="nas-field-wide">Marca do Destino: atributo que recebe +2 (+3 no nível 6)
+          <select name="giftAttr"><option value="">—</option>{{#each giftAttrOptions}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+        </label>
+      {{/if}}
+    {{/if}}
+
+    {{#if isStep.[3]}}
+      <h3 class="nas-panel-title"><i class="fa-solid fa-wind" aria-hidden="true"></i> Respiração e arma</h3>
+      <div class="nas-fields">
+        <label class="nas-field-wide">Respiração Primária <small>(com aprovação do Mestre)</small>
+          <select name="breathing">
+            <option value="">Escolher…</option>
+            {{#each breathings}}<option value="{{name}}" {{#if selected}}selected{{/if}}>{{name}}{{#if missing}} (Formas pela regra escrita){{/if}}</option>{{/each}}
+          </select>
+        </label>
+        <label class="nas-field-wide">Arma proficiente
+          <input name="weapon" value="{{s.weapon}}" placeholder="Katana">
+        </label>
+        {{#if earlyClasses}}
+          <label class="nas-field-wide">Classe no nível 1 <small>(exceção de mesa autorizada pelo Mestre)</small>
+            <select name="earlyClass">
+              <option value="">Escolher no nível 4 (regra base)</option>
+              {{#each earlyClasses}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+            </select>
+          </label>
+        {{/if}}
+      </div>
+    {{/if}}
+
+    {{#if isStep.[4]}}
+      <h3 class="nas-panel-title"><i class="fa-solid fa-feather" aria-hidden="true"></i> Resumo</h3>
+      {{#if values}}<div class="nas-summary-attrs">{{#each values}}<span><small>{{label}}</small><strong>{{v}}</strong></span>{{/each}}</div>{{/if}}
+      <dl class="nas-readouts">
+        <div><dt>Patente</dt><dd>Aspirante a Exterminador</dd></div>
+        <div><dt>Origem</dt><dd>{{origin.name}} ({{lookup methodText s.originMethod}})</dd></div>
+        <div><dt>Dom do Sangue</dt><dd>{{gift.name}} ({{lookup methodText s.giftMethod}})</dd></div>
+        <div><dt>Respiração</dt><dd>{{s.breathing}}</dd></div>
+        <div><dt>Arma proficiente</dt><dd>{{#if s.weapon}}{{s.weapon}}{{else}}—{{/if}}</dd></div>
+        {{#if preview}}<div><dt>Nível 1</dt><dd>PDV {{preview.pdv}} · PDR {{preview.pdr}} · Fôlego {{preview.folego}}</dd></div>{{/if}}
+      </dl>
+    {{/if}}
+  </section>
+
+  {{#if error}}<p class="nas-wizard-error"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {{error}}</p>{{/if}}
+
+  <footer class="nas-wizard-footer">
+    <button type="button" data-action="back" {{#if first}}disabled{{/if}}><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Voltar</button>
+    {{#if last}}
+      <button type="button" class="nas-primary" data-action="finish" {{#if error}}disabled{{/if}}><i class="fa-solid fa-check" aria-hidden="true"></i> Concluir criação</button>
+    {{else}}
+      <button type="button" class="nas-primary" data-action="next">Avançar <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+    {{/if}}
+  </footer>
+</div>

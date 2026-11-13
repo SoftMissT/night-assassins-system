@@ -28,3 +28,9 @@ night-assassins-csb-automation/
 
 # especificacoes locais (nao versionar)
 /.specs/
+
+# capa com arte de terceiros: so local, nunca versionar nem empacotar
+/assets/media/module-cover.webp
+
+# skills locais do GitNexus (tooling de dev)
+/.agents/

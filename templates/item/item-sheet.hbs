@@ -1,0 +1,69 @@
+<div class="nas-item-app">
+  <header class="nas-item-head">
+    <img class="nas-item-img" src="{{item.img}}" alt="" data-action="editImage" data-edit="img" data-tooltip="Trocar imagem">
+    <div class="nas-item-title">
+      <input class="nas-item-name" type="text" name="name" value="{{item.name}}" aria-label="Nome" {{#unless editable}}disabled{{/unless}}>
+      <span class="nas-item-kind">{{#if isWeapon}}Arma · {{#if isSpecial}}Especial (Dupla Alma){{else}}Nichirin{{/if}}{{else}}{{#each categories}}{{#if selected}}{{label}}{{/if}}{{/each}}{{/if}}</span>
+    </div>
+  </header>
+  <div class="nas-item-body">
+    <div class="nas-item-grid">
+      {{#unless isWeapon}}
+        <label>Categoria<select name="system.category" {{#unless editable}}disabled{{/unless}}>{{#each categories}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+      {{/unless}}
+      <label>Quantidade<input type="number" min="0" name="system.quantity" value="{{system.quantity}}" {{#unless editable}}disabled{{/unless}}></label>
+      <label>Peso (kg)<input type="number" min="0" step="0.1" name="system.weight" value="{{system.weight}}" {{#unless editable}}disabled{{/unless}}></label>
+      <label>Raridade<select name="system.rarity" {{#unless editable}}disabled{{/unless}}>{{#each rarities}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+    </div>
+
+    {{#if isWeapon}}
+      <section class="nas-panel">
+        <h3 class="nas-panel-title"><i class="fa-solid fa-khanda" aria-hidden="true"></i> Combate</h3>
+        <dl class="nas-item-facts">
+          <dt>Tipo</dt><dd>{{system.type}}</dd>
+          <dt>Acerto com</dt><dd>{{hitAttrs}}</dd>
+          <dt>Propriedades</dt><dd>{{system.properties}}</dd>
+          <dt>Tipos de dano</dt><dd>{{#each system.damageTypes}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</dd>
+          {{#if system.requirement}}<dt>Requisito</dt><dd>{{system.requirement}}</dd>{{/if}}
+        </dl>
+        <table class="nas-table">
+          <thead><tr><th>Perfil em uso</th><th>Dano</th><th>Alcance</th><th>Crítico</th><th>Golpes</th></tr></thead>
+          <tbody>
+            {{#each profiles}}
+              <tr class="{{#if selected}}is-selected{{/if}}">
+                <td><label><input type="radio" name="system.profileIndex" value="{{index}}" {{#if selected}}checked{{/if}} {{#unless ../editable}}disabled{{/unless}}> {{name}}</label></td>
+                <td>{{damage}}</td><td>{{range}}</td><td class="nas-num">{{crit}}+</td><td class="nas-num">{{attacks}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </section>
+      {{#if isSpecial}}
+        <section class="nas-panel">
+          <h3 class="nas-panel-title"><i class="fa-solid fa-yin-yang" aria-hidden="true"></i> Dupla Alma <span class="nas-panel-meta">regra escrita; automação na fatia de armas especiais</span></h3>
+          <p><strong>Entidade:</strong> {{system.special.entity}} · <strong>Demônio:</strong> {{system.special.demon}}</p>
+          <ul class="nas-item-list">{{#each system.special.summary}}<li>{{this}}</li>{{/each}}</ul>
+          {{#if system.special.critRule}}<p class="nas-muted">{{system.special.critRule}}</p>{{/if}}
+        </section>
+      {{/if}}
+    {{else}}
+      <section class="nas-panel">
+        <h3 class="nas-panel-title"><i class="fa-solid fa-hand-sparkles" aria-hidden="true"></i> Uso</h3>
+        <div class="nas-item-grid">
+          <label>Cura ao usar (fórmula)<input type="text" name="system.heal" value="{{system.heal}}" placeholder="ex.: 1d6 + 2" {{#unless editable}}disabled{{/unless}}></label>
+          <label>Efeito no chat<input type="text" name="system.effect" value="{{system.effect}}" placeholder="ex.: remove Sangramento" {{#unless editable}}disabled{{/unless}}></label>
+        </div>
+      </section>
+    {{/if}}
+
+    <section class="nas-panel">
+      <h3 class="nas-panel-title"><i class="fa-solid fa-feather" aria-hidden="true"></i> Descrição</h3>
+      {{#if editable}}
+        <prose-mirror name="system.description" value="{{system.description}}" toggled>{{{descriptionHTML}}}</prose-mirror>
+      {{else}}
+        <div class="nas-item-desc">{{{descriptionHTML}}}</div>
+      {{/if}}
+      {{#if system.rule}}<p class="nas-muted nas-item-rule">{{system.rule}}</p>{{/if}}
+    </section>
+  </div>
+</div>

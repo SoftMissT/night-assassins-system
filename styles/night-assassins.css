@@ -1,5 +1,15 @@
 /* Night Assassins — ficha Slayer. Escopo estrito em .nas-sheet.
    Tokens amostrados dos mockups aprovados em assets/references/ (03 e 07). */
+
+/* Cinzel (SIL OFL 1.1, assets/fonts/Cinzel-OFL.txt); subset latin cobre o português. */
+@font-face {
+  font-family: "Cinzel";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../assets/fonts/cinzel-latin.woff2") format("woff2");
+}
+
 .nas-sheet {
   --na-bg: #0b0708;
   --na-bg-glow: rgba(199, 15, 26, 0.16);
@@ -35,24 +45,26 @@
     var(--na-bg);
 }
 
-/* ---------- reset local de controles ---------- */
-.nas-sheet :is(button, select, input) {
+/* ---------- reset local de controles ----------
+   Só dentro do conteúdo: os botões do cabeçalho da janela desenham o ícone pela fonte Font Awesome
+   na própria classe, e `font: inherit` os transformava em quadrados. :where() mantém a especificidade. */
+.nas-sheet :where(.window-content) :is(button, select, input) {
   font: inherit;
   color: inherit;
 }
-.nas-sheet input,
-.nas-sheet select {
+.nas-sheet :where(.window-content) input,
+.nas-sheet :where(.window-content) select {
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid var(--na-line);
   border-radius: 4px;
   color: var(--na-text);
 }
-.nas-sheet input:disabled,
-.nas-sheet select:disabled {
+.nas-sheet :where(.window-content) input:disabled,
+.nas-sheet :where(.window-content) select:disabled {
   opacity: 0.85;
   border-color: transparent;
 }
-.nas-sheet button {
+.nas-sheet :where(.window-content) button {
   cursor: pointer;
   background: linear-gradient(180deg, #1f1516, #140d0e);
   border: 1px solid var(--na-line);
@@ -60,7 +72,7 @@
   color: var(--na-text);
   line-height: 1.2;
 }
-.nas-sheet button:hover {
+.nas-sheet :where(.window-content) button:hover {
   border-color: var(--na-line-strong);
   box-shadow: 0 0 10px rgba(215, 149, 75, 0.18);
 }
@@ -353,6 +365,12 @@
 .nas-sheet .nas-panel-calm .nas-panel-title > i,
 .nas-sheet .nas-panel-calm .nas-empty > i {
   color: var(--na-calm);
+}
+.nas-sheet .nas-panel-epic {
+  border-color: rgba(233, 192, 138, 0.55);
+  background:
+    radial-gradient(80% 140% at 0% 0%, rgba(215, 149, 75, 0.14), transparent 60%),
+    linear-gradient(180deg, var(--na-panel-2), var(--na-panel));
 }
 .nas-sheet .nas-grid {
   display: grid;
@@ -687,6 +705,17 @@
 .nas-sheet .nas-nav-item.is-active {
   background: linear-gradient(90deg, rgba(199, 15, 26, 0.28), transparent);
 }
+/* O core desenha outline + sombra em todo botão .active: era o segundo círculo em volta do ícone. */
+.nas-sheet .nas-nav-item,
+.nas-sheet .nas-nav-item.active,
+.nas-sheet .nas-nav-item:focus {
+  outline: none;
+  box-shadow: none;
+}
+.nas-sheet .nas-nav-item:focus-visible .nas-nav-icon {
+  outline: 2px solid var(--na-gold);
+  outline-offset: 2px;
+}
 .nas-sheet .nas-nav-item.is-active .nas-nav-icon {
   border-color: var(--na-red-hot);
   background: radial-gradient(circle at 50% 35%, #5a0d13, #1a0709);
@@ -702,9 +731,11 @@
   .nas-sheet .nas-nav-text {
     display: none;
   }
-  .nas-sheet .nas-nav-item {
+  .nas-sheet .nas-nav-item,
+  .nas-sheet .nas-nav-item.is-active {
     justify-content: center;
     border-radius: 50%;
+    background: transparent; /* só o ícone brilha: um círculo, não dois */
   }
   .nas-sheet .nas-skill-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -717,3 +748,1004 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- mecânica (fatia 1 + rolagens) ---------- */
+.nas-sheet .nas-resource-max {
+  min-width: 44px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--na-text);
+}
+.nas-sheet .nas-attr-current {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--nas-accent);
+}
+.nas-sheet .nas-field-wide {
+  grid-column: 1 / -1;
+}
+.nas-sheet .nas-readouts-tight {
+  margin-top: 12px;
+}
+.nas-sheet .nas-readouts-tight > div {
+  grid-template-columns: 150px 1fr;
+  padding: 5px 2px;
+  font-size: 13px;
+}
+.nas-sheet button.nas-stat {
+  height: auto;
+  text-align: left;
+  font: inherit;
+}
+.nas-sheet .nas-stat-roll:hover > i {
+  color: var(--na-gold-soft);
+}
+.nas-sheet .nas-slot.is-used {
+  opacity: 0.5;
+  border-style: dashed;
+}
+.nas-sheet .nas-slot.is-used > i {
+  color: var(--na-muted);
+}
+.nas-sheet .nas-segmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.nas-sheet .nas-segmented button {
+  height: auto;
+  padding: 10px 12px;
+  font-family: var(--na-display);
+  letter-spacing: 0.06em;
+}
+.nas-sheet .nas-segmented button.is-active {
+  border-color: var(--na-red-hot);
+  background: linear-gradient(180deg, #5a0d13, #2a0709);
+  box-shadow: 0 0 12px rgba(232, 50, 62, 0.35);
+}
+.nas-sheet .nas-inline-btn {
+  height: auto;
+  margin-left: auto;
+  padding: 4px 10px;
+  font-family: var(--na-body);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+.nas-sheet dd .nas-inline-btn {
+  margin-left: 0;
+}
+.nas-sheet .nas-inline-btn.is-used {
+  border-color: var(--na-red-hot);
+  color: var(--na-red-hot);
+}
+.nas-sheet .nas-death {
+  display: grid;
+  gap: 10px;
+}
+.nas-sheet .nas-death-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nas-sheet .nas-death-label {
+  flex: 1;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-pips {
+  display: flex;
+  gap: 6px;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.15);
+}
+.nas-sheet .nas-pips .is-on {
+  color: var(--na-red-hot);
+  text-shadow: 0 0 8px rgba(232, 50, 62, 0.6);
+}
+.nas-sheet .nas-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nas-sheet .nas-stepper button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+}
+.nas-sheet .nas-stepper strong {
+  min-width: 44px;
+  text-align: center;
+  font-family: var(--na-display);
+  font-size: 18px;
+}
+
+/* ---------- criação (nível 0 → 1) e subir de nível ---------- */
+.nas-sheet .nas-levelup-btn {
+  align-self: flex-start;
+  height: auto;
+  margin: 6px 4px 0;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+.nas-sheet .nas-create-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.nas-sheet .nas-create-banner > div {
+  flex: 1;
+}
+.nas-sheet .nas-create-banner p {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+.nas-sheet button.nas-primary {
+  height: auto;
+  padding: 9px 16px;
+  border-color: var(--na-red-hot);
+  background: linear-gradient(180deg, #7a121b, #3a080c);
+  font-family: var(--na-display);
+  letter-spacing: 0.06em;
+}
+.nas-sheet button.nas-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.nas-sheet.nas-wizard .window-content,
+.nas-sheet.nas-levelup .window-content {
+  padding: 16px 18px;
+  overflow-y: auto;
+}
+.nas-sheet .nas-wizard-body {
+  display: grid;
+  gap: 14px;
+}
+.nas-sheet .nas-steps {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nas-sheet .nas-steps li {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--na-line);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-steps li span {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 11px;
+}
+.nas-sheet .nas-steps li.is-active {
+  border-color: var(--na-red-hot);
+  color: var(--na-text);
+}
+.nas-sheet .nas-steps li.is-active span {
+  background: var(--na-red-hot);
+}
+.nas-sheet .nas-steps li.is-done span {
+  background: var(--na-gold);
+  color: #140a08;
+}
+.nas-sheet .nas-method-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.nas-sheet .nas-method-row button {
+  display: grid;
+  gap: 4px;
+  height: auto;
+  padding: 10px;
+  text-align: left;
+}
+.nas-sheet .nas-method-row button small {
+  color: var(--na-muted);
+  font-size: 11px;
+}
+.nas-sheet :is(.nas-method-row, .nas-roll-or-choose) button.is-active {
+  border-color: var(--na-red-hot);
+  box-shadow: 0 0 10px rgba(232, 50, 62, 0.3);
+}
+.nas-sheet .nas-attempts {
+  display: grid;
+  gap: 8px;
+}
+.nas-sheet .nas-attempt {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--na-line);
+  border-radius: 4px;
+}
+.nas-sheet .nas-attempt strong {
+  font-family: var(--na-display);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+}
+.nas-sheet .nas-attempt button {
+  height: auto;
+  padding: 4px 10px;
+}
+.nas-sheet .nas-attempt.is-chosen {
+  border-color: var(--na-gold);
+}
+.nas-sheet .nas-discord {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+}
+.nas-sheet .nas-discord textarea {
+  min-height: 44px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--na-text);
+  border: 1px solid var(--na-line);
+}
+.nas-sheet .nas-discord-counter {
+  font-size: 12px;
+  color: #ff8c1a;
+}
+.nas-sheet .nas-discord-counter[data-ok="true"] {
+  color: #3ddc84;
+}
+.nas-sheet .nas-distribution {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+.nas-sheet .nas-distribution label {
+  display: grid;
+  gap: 4px;
+  text-align: center;
+  font-family: var(--na-display);
+  letter-spacing: 0.08em;
+}
+.nas-sheet .nas-roll-or-choose {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.nas-sheet .nas-roll-or-choose label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-roll-or-choose button {
+  height: auto;
+}
+.nas-sheet .nas-summary-attrs {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+.nas-sheet .nas-summary-attrs span {
+  display: grid;
+  justify-items: center;
+  padding: 6px;
+  border: 1px solid var(--na-line);
+  border-radius: 4px;
+}
+.nas-sheet .nas-summary-attrs strong {
+  font-family: var(--na-display);
+  font-size: 24px;
+}
+.nas-sheet .nas-wizard-error {
+  margin: 0;
+  color: #ff8c1a;
+  font-size: 13px;
+}
+.nas-sheet .nas-wizard-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.nas-sheet .nas-wizard-footer button {
+  height: auto;
+  padding: 8px 14px;
+}
+.nas-sheet .nas-levelup-body {
+  display: grid;
+  gap: 8px;
+  min-width: 420px;
+}
+.nas-sheet .nas-levelup-body p {
+  margin: 0;
+}
+
+/* ---------- abas nativas (changeTab) ---------- */
+.nas-sheet .nas-main {
+  overflow: hidden;
+  display: block;
+  padding-right: 0;
+}
+.nas-sheet .nas-tab {
+  display: none;
+}
+.nas-sheet .nas-tab.active {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.nas-sheet .nas-tabs-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  height: 100%;
+}
+
+/* ---------- atributos totais (sem input) ---------- */
+.nas-sheet .nas-attribute .nas-attr-label {
+  grid-column: 1 / -1;
+  font-family: var(--na-display);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+.nas-sheet .nas-attr-total {
+  font-family: var(--na-display);
+  font-size: 32px;
+  line-height: 1;
+  color: var(--nas-accent);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--nas-accent) 50%, transparent);
+}
+.nas-sheet .nas-panel-compact {
+  padding: 8px 10px;
+}
+.nas-sheet .nas-attribute-rail-mini {
+  grid-auto-columns: minmax(70px, 1fr);
+  gap: 8px;
+}
+.nas-sheet button.nas-attribute-mini {
+  height: auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 10px;
+}
+.nas-sheet .nas-attribute-mini .nas-attr-total {
+  font-size: 22px;
+}
+
+/* ---------- selects legíveis (opções escuras) ---------- */
+.nas-sheet select option {
+  background: #140d0e;
+  color: var(--na-text);
+}
+.nas-sheet select option:disabled {
+  color: #6d625a;
+}
+.nas-sheet dd select {
+  width: 100%;
+  height: 26px;
+}
+
+/* ---------- marcos do nível ---------- */
+.nas-sheet .nas-subhead {
+  margin: 8px 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--na-gold-soft);
+}
+.nas-sheet .nas-events {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+.nas-sheet .nas-events li i {
+  width: 16px;
+  color: var(--na-gold);
+}
+.nas-sheet .nas-events-next li,
+.nas-sheet .nas-events li.is-locked {
+  color: var(--na-muted);
+}
+.nas-sheet .nas-events-next li i,
+.nas-sheet .nas-events li.is-locked i {
+  color: var(--na-muted);
+}
+
+/* ---------- tabela de Formas ---------- */
+.nas-sheet .nas-table-wrap {
+  overflow-x: auto;
+}
+.nas-sheet .nas-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.nas-sheet .nas-table th {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--na-line);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(215, 149, 75, 0.1);
+  vertical-align: top;
+}
+.nas-sheet .nas-table td small {
+  display: block;
+  font-size: 11px;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-table .nas-num {
+  font-family: var(--na-display);
+  color: var(--na-blue);
+}
+.nas-sheet .nas-table .nas-effect {
+  max-width: 420px;
+  color: #d8cfc5;
+}
+.nas-sheet .nas-table tr.is-locked td {
+  opacity: 0.45;
+}
+.nas-sheet .nas-use {
+  height: auto;
+  padding: 5px 12px;
+  border-color: var(--na-blue);
+}
+
+/* ---------- ações (chips) ---------- */
+.nas-sheet .nas-slot-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.nas-sheet .nas-slot-chip {
+  padding: 5px 10px;
+  border: 1px solid var(--na-line);
+  border-radius: 20px;
+  font-size: 12px;
+}
+.nas-sheet .nas-slot-chip i {
+  color: var(--na-gold);
+}
+.nas-sheet .nas-slot-chip.is-used {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+/* ---------- status ---------- */
+.nas-sheet .nas-status-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 6px 16px;
+}
+.nas-sheet .nas-status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.nas-sheet .nas-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: auto;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-status img {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  opacity: 0.6;
+  filter: invert(0.85);
+}
+.nas-sheet .nas-status.is-on {
+  border-color: var(--na-red-hot);
+  background: linear-gradient(180deg, #5a0d13, #2a0709);
+  color: var(--na-text);
+  box-shadow: 0 0 10px rgba(232, 50, 62, 0.35);
+}
+.nas-sheet .nas-status.is-on img {
+  opacity: 1;
+}
+
+/* ---------- configurações ---------- */
+.nas-sheet .nas-bonus-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.nas-sheet .nas-bonus-grid-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.nas-sheet .nas-bonus-grid label {
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-bonus-grid label small {
+  text-transform: none;
+  color: var(--na-gold-soft);
+}
+.nas-sheet .nas-bonus-grid input {
+  height: 28px;
+  text-align: center;
+}
+.nas-sheet .nas-inline-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-inline-field input {
+  width: 70px;
+  height: 26px;
+  text-align: center;
+}
+
+/* ---------- cartões de chat ---------- */
+.nas-chat-card h3 {
+  margin: 0 0 4px;
+  font-family: "Cinzel", Georgia, serif;
+}
+.nas-chat-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.nas-chat-buttons button {
+  flex: 1;
+  line-height: 24px;
+}
+
+.nas-sheet .nas-chances { font-size: 13px; color: var(--na-gold-soft); }
+
+/* ---------- diálogos de rolagem e nível de Forma (fora da ficha: herdam o tema do core) ---------- */
+.nas-dialog { display: grid; gap: 8px; }
+.nas-dialog p { margin: 0; }
+.nas-dialog-field { display: grid; gap: 4px; font-weight: 600; }
+.nas-dialog-field small { font-weight: 400; opacity: 0.75; }
+.nas-level-list { display: grid; gap: 4px; }
+.nas-level-option {
+  display: grid;
+  grid-template-columns: auto auto auto 1fr;
+  gap: 4px 10px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border, #7a6a55);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.nas-level-option small { grid-column: 1 / -1; opacity: 0.8; }
+.nas-level-option:has(input:checked) { border-color: #c9a14a; box-shadow: inset 0 0 0 1px #c9a14a; }
+.nas-level-option.is-locked { opacity: 0.45; cursor: not-allowed; }
+.nas-level-list--row { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+.nas-level-list--row .nas-level-option { grid-template-columns: auto auto 1fr; }
+
+/* ======================================================================
+   Barras de recurso no padrão dos mockups (ícone, rótulo, barra grossa
+   com brilho, "atual / máximo" em texto; o atual edita sem caixa).
+   ====================================================================== */
+.nas-sheet .nas-resources {
+  gap: 9px;
+  padding: 12px 16px;
+  background:
+    linear-gradient(90deg, rgba(199, 15, 26, 0.08), transparent 40%),
+    var(--na-panel);
+}
+.nas-sheet .nas-resource {
+  grid-template-columns: 22px 70px minmax(0, 1fr) 104px;
+  gap: 12px;
+}
+.nas-sheet .nas-resource-icon {
+  font-size: 18px;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--nas-res) 60%, transparent));
+}
+.nas-sheet .nas-resource-label {
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--nas-res) 35%, transparent);
+}
+.nas-sheet .nas-resource-track {
+  position: relative;
+  height: 18px;
+  border: 1px solid color-mix(in srgb, var(--nas-res) 30%, rgba(255, 255, 255, 0.12));
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(255, 255, 255, 0.05) calc(10% - 1px) 10%),
+    linear-gradient(180deg, #050303, #140c0c);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+.nas-sheet .nas-resource-fill {
+  position: relative;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--nas-res) 45%, black) 0%,
+    var(--nas-res) 70%,
+    color-mix(in srgb, var(--nas-res) 55%, white) 100%);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--nas-res) 65%, transparent);
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.nas-sheet .nas-resource-fill::after {
+  content: "";
+  position: absolute;
+  inset: 1px 0 50% 0;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
+}
+.nas-sheet .nas-resource-values {
+  justify-content: flex-end;
+  gap: 3px;
+  font-family: var(--na-display);
+  font-size: 16px;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-resource-values input {
+  width: 3.8ch;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px dashed transparent;
+  border-radius: 0;
+  background: transparent;
+  text-align: right;
+  font-family: var(--na-display);
+  font-size: 16px;
+  color: var(--na-text);
+  -moz-appearance: textfield;
+}
+.nas-sheet .nas-resource-values input::-webkit-inner-spin-button,
+.nas-sheet .nas-resource-values input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.nas-sheet .nas-resource-values input:hover:not(:disabled),
+.nas-sheet .nas-resource-values input:focus { border-bottom-color: var(--nas-res); outline: none; }
+.nas-sheet .nas-resource-values input:disabled { opacity: 1; border-color: transparent; }
+.nas-sheet .nas-resource-max { min-width: 0; text-align: left; font-weight: 400; color: var(--na-text); }
+
+/* emblema hexagonal da seção (mockups) */
+.nas-sheet .nas-emblem {
+  position: relative;
+  width: 60px;
+  height: 68px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  filter: drop-shadow(0 0 9px rgba(232, 50, 62, 0.55));
+}
+.nas-sheet .nas-emblem::before,
+.nas-sheet .nas-emblem::after {
+  content: "";
+  position: absolute;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.nas-sheet .nas-emblem::before { inset: 0; background: linear-gradient(160deg, #ff6a72, #b0101a 55%, #4d0509); }
+.nas-sheet .nas-emblem::after { inset: 3px; background: radial-gradient(circle at 50% 35%, #521018, #140708 75%); }
+.nas-sheet .nas-emblem i {
+  position: relative;
+  z-index: 1;
+  font-size: 24px;
+  color: #ffeaea;
+  text-shadow: 0 0 10px rgba(232, 50, 62, 0.85);
+}
+
+/* títulos de painel: meta curto, nunca quebra o título */
+.nas-sheet .nas-panel-title { min-width: 0; white-space: nowrap; } /* o título nunca quebra; o meta encolhe com reticências */
+.nas-sheet :where(.window-content) button:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.nas-sheet .nas-panel-meta { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nas-sheet .nas-title-stack > span:first-child { display: inline-flex; gap: 10px; align-items: center; white-space: nowrap; }
+.nas-sheet .nas-title-stack > span:first-child i { color: var(--na-gold); }
+.nas-sheet .nas-title-actions { margin-left: auto; display: inline-flex; gap: 6px; }
+.nas-sheet .nas-title-actions .nas-inline-btn { letter-spacing: 0.02em; text-transform: none; font-family: var(--na-body); }
+
+/* ======================================================================
+   Inventário (mockup 05)
+   ====================================================================== */
+.nas-sheet .nas-inv-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 34%);
+  gap: 14px;
+  align-items: start;
+}
+.nas-sheet .nas-inv-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.nas-sheet .nas-inv-search { position: relative; display: flex; align-items: center; }
+.nas-sheet .nas-inv-search i { position: absolute; left: 12px; color: var(--na-muted); pointer-events: none; }
+.nas-sheet .nas-inv-search input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 36px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+}
+.nas-sheet .nas-inv-weight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 14px;
+  border: 1px solid var(--na-line);
+  border-radius: var(--na-radius);
+  background: rgba(0, 0, 0, 0.3);
+}
+.nas-sheet .nas-inv-weight > i { font-size: 18px; color: var(--na-gold); }
+.nas-sheet .nas-inv-weight div { display: grid; line-height: 1.15; }
+.nas-sheet .nas-inv-weight span { font-size: 11px; color: var(--na-muted); }
+/* Cinzel só tem maiúsculas: números com unidade ("2,7 kg") ficam na fonte de texto. */
+.nas-sheet .nas-inv-weight strong { font-family: var(--na-body); font-size: 17px; font-weight: 600; }
+.nas-sheet .nas-inv-filters { display: flex; gap: 4px; margin-bottom: 8px; overflow-x: auto; scrollbar-width: none; }
+.nas-sheet .nas-inv-filters button { flex: 1 0 auto; height: 32px; padding: 0 6px; font-size: 12.5px; color: #d9cfc4; white-space: nowrap; }
+.nas-sheet .nas-inv-filters button i { color: var(--na-muted); }
+.nas-sheet .nas-inv-filters button.is-active {
+  border-color: var(--na-red-hot);
+  background: linear-gradient(180deg, #a3121c, #5e070d);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(232, 50, 62, 0.45);
+}
+.nas-sheet .nas-inv-filters button.is-active i { color: #fff; }
+.nas-sheet .nas-inv-table td { vertical-align: middle; padding: 5px 8px; }
+.nas-sheet .nas-inv-table .nas-num { color: var(--na-text); text-align: center; white-space: nowrap; font-family: var(--na-body); font-size: 14px; }
+.nas-sheet .nas-inv-table th.nas-num { text-align: center; }
+.nas-sheet .nas-inv-row { cursor: pointer; }
+.nas-sheet .nas-inv-row[hidden] { display: none; }
+.nas-sheet .nas-inv-row:hover td { background: rgba(215, 149, 75, 0.05); }
+.nas-sheet .nas-inv-row.is-selected td {
+  background: linear-gradient(90deg, rgba(199, 15, 26, 0.28), rgba(199, 15, 26, 0.06));
+  border-top: 1px solid rgba(232, 50, 62, 0.65);
+  border-bottom: 1px solid rgba(232, 50, 62, 0.65);
+}
+.nas-sheet .nas-inv-row.is-selected td:first-child { border-left: 1px solid rgba(232, 50, 62, 0.65); }
+.nas-sheet .nas-inv-row.is-selected td:last-child { border-right: 1px solid rgba(232, 50, 62, 0.65); }
+.nas-sheet .nas-inv-item { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.nas-sheet .nas-inv-item img {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  object-fit: cover;
+  border: 1px solid var(--na-line);
+  border-radius: 4px;
+  background: #080505;
+}
+.nas-sheet .nas-equipped { color: var(--na-gold); font-size: 12px; }
+.nas-sheet .nas-inv-type { white-space: nowrap; color: #d9cfc4; }
+.nas-sheet .nas-inv-type i { width: 16px; text-align: center; color: var(--na-muted); }
+.nas-sheet .nas-row-actions { display: inline-flex; gap: 6px; }
+.nas-sheet .nas-icon-btn { display: grid; place-items: center; width: 32px; height: 28px; padding: 0; font-size: 13px; }
+.nas-sheet .nas-rarity-comum { color: var(--na-text); }
+.nas-sheet .nas-rarity-incomum { color: #5fd49a; }
+.nas-sheet .nas-rarity-raro { color: #55aaff; }
+.nas-sheet .nas-rarity-epico { color: #bb86ff; }
+.nas-sheet .nas-rarity-lendario { color: #f2b84b; }
+
+.nas-sheet .nas-inv-details { position: sticky; top: 0; }
+.nas-sheet .nas-inv-detail { display: grid; gap: 12px; }
+.nas-sheet .nas-inv-detail[hidden] { display: none; }
+.nas-sheet .nas-inv-detail-head { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 14px; }
+.nas-sheet .nas-inv-detail-head img {
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+  border: 1px solid var(--na-line-strong);
+  border-radius: var(--na-radius);
+  background: radial-gradient(circle, #2a0b0e, #080505);
+  box-shadow: 0 0 16px rgba(199, 15, 26, 0.25);
+}
+.nas-sheet .nas-inv-detail-head > div { display: grid; align-content: start; gap: 2px; min-width: 0; }
+.nas-sheet .nas-inv-detail-head strong { font-family: var(--na-display); font-size: 18px; font-weight: 600; line-height: 1.2; }
+.nas-sheet .nas-inv-detail-head dl { margin: 8px 0 0; display: grid; gap: 4px; }
+.nas-sheet .nas-inv-detail-head dl div { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.nas-sheet .nas-inv-detail-head dt { color: var(--na-muted); }
+.nas-sheet .nas-inv-detail-head dd { margin: 0; font-weight: 600; }
+.nas-sheet .nas-inv-desc { max-height: 160px; overflow-y: auto; padding-right: 4px; font-size: 13px; line-height: 1.45; color: #ddd3c8; }
+.nas-sheet .nas-inv-desc p { margin: 0 0 6px; }
+.nas-sheet .nas-inv-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.nas-sheet .nas-inv-buttons button { height: 38px; font-size: 14px; }
+.nas-sheet .nas-inv-buttons button.nas-primary { grid-column: 1 / -1; height: 44px; font-family: var(--na-display); font-size: 16px; letter-spacing: 0.05em; }
+.nas-sheet button.nas-danger { border-color: rgba(232, 50, 62, 0.6); background: linear-gradient(180deg, #4a0c11, #26080a); }
+.nas-sheet button.nas-danger:hover { box-shadow: 0 0 12px rgba(232, 50, 62, 0.4); }
+
+/* arma equipada (Combate) */
+.nas-sheet .nas-weapon { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+.nas-sheet .nas-weapon > img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid var(--na-line-strong);
+  border-radius: var(--na-radius);
+  background: #080505;
+}
+.nas-sheet .nas-weapon-info { display: grid; gap: 4px; min-width: 0; }
+.nas-sheet .nas-weapon-info > strong { font-family: var(--na-display); font-size: 17px; font-weight: 600; }
+.nas-sheet .nas-weapon-line { font-size: 13px; color: var(--na-muted); }
+.nas-sheet .nas-weapon-line b { color: var(--na-text); font-weight: 600; }
+.nas-sheet .nas-chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.nas-sheet .nas-chip { height: 26px; padding: 0 10px; border-radius: 13px; font-size: 12px; color: var(--na-muted); }
+.nas-sheet .nas-chip.is-active { border-color: var(--na-gold); color: var(--na-text); background: linear-gradient(180deg, #3a2614, #1d130a); }
+.nas-sheet .nas-weapon-attack { height: 46px; padding: 0 22px; font-family: var(--na-display); font-size: 16px; }
+
+@container (max-width: 820px) {
+  .nas-sheet .nas-inv-layout { grid-template-columns: minmax(0, 1fr); }
+  .nas-sheet .nas-inv-details { position: static; }
+}
+
+/* ======================================================================
+   Ficha de Item (arma / item de inventário)
+   ====================================================================== */
+.nas-sheet.nas-item-sheet { min-width: 480px; min-height: 420px; }
+.nas-item-sheet .nas-item-app { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.nas-item-sheet .nas-item-head {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--na-line);
+  background: radial-gradient(90% 140% at 0% 50%, rgba(199, 15, 26, 0.28), transparent 70%), var(--na-panel);
+}
+.nas-item-sheet .nas-item-img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 1px solid var(--na-line-strong);
+  border-radius: var(--na-radius);
+  background: #080505;
+  box-shadow: 0 0 16px rgba(199, 15, 26, 0.3);
+  cursor: pointer;
+}
+.nas-item-sheet .nas-item-title { display: grid; gap: 4px; min-width: 0; }
+.nas-item-sheet .nas-item-name {
+  height: auto;
+  padding: 2px 4px;
+  border-color: transparent;
+  background: transparent;
+  font-family: var(--na-display);
+  font-size: 20px;
+}
+.nas-item-sheet .nas-item-name:hover:not(:disabled), .nas-item-sheet .nas-item-name:focus { border-color: var(--na-line); }
+.nas-item-sheet .nas-item-kind { padding: 0 4px; font-size: 13px; color: var(--na-gold-soft); }
+.nas-item-sheet .nas-item-body { flex: 1; min-height: 0; overflow-y: auto; display: grid; align-content: start; gap: 12px; padding: 14px 16px; }
+.nas-item-sheet .nas-item-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+.nas-item-sheet .nas-item-grid label { display: grid; gap: 4px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--na-muted); }
+.nas-item-sheet .nas-item-grid :is(input, select) { height: 30px; text-transform: none; letter-spacing: 0; }
+.nas-item-sheet .nas-item-facts { display: grid; grid-template-columns: 130px 1fr; gap: 5px 12px; margin: 0 0 12px; font-size: 13px; }
+.nas-item-sheet .nas-item-facts dt { color: var(--na-muted); }
+.nas-item-sheet .nas-item-facts dd { margin: 0; }
+.nas-item-sheet .nas-table tr.is-selected td { background: rgba(199, 15, 26, 0.18); }
+.nas-item-sheet .nas-table td { vertical-align: middle; }
+.nas-item-sheet .nas-item-list { margin: 6px 0; padding-left: 18px; font-size: 13px; line-height: 1.45; }
+.nas-item-sheet prose-mirror { min-height: 140px; display: block; }
+.nas-item-sheet .nas-item-desc { font-size: 13px; line-height: 1.5; }
+.nas-item-sheet .nas-item-rule { margin-top: 8px; font-size: 12px; }
+
+/* ======================================================================
+   Lembretes de bônus (ficha) e diálogos de rolagem/dano (fora da ficha)
+   ====================================================================== */
+.nas-sheet .nas-reminder-list { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 6px; }
+.nas-sheet .nas-reminder-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--na-line);
+  border-left: 3px solid var(--na-gold);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
+}
+.nas-sheet .nas-reminder-list small { color: var(--na-muted); }
+.nas-sheet .nas-reminder-list li.nas-reminder-vantagem { border-left-color: var(--na-calm); }
+.nas-sheet .nas-reminder-list li.nas-reminder-desvantagem { border-left-color: var(--na-red-hot); }
+.nas-sheet .nas-reminder-form {
+  display: grid;
+  grid-template-columns: minmax(160px, 2fr) minmax(120px, 1.3fr) minmax(110px, 1fr) minmax(80px, 0.8fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+.nas-sheet .nas-reminder-form :is(input, select) { height: 30px; min-width: 0; }
+.nas-sheet .nas-reminder-uses { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--na-muted); white-space: nowrap; }
+.nas-sheet .nas-reminder-uses input { width: 52px; text-align: center; }
+.nas-sheet .nas-reminder-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.nas-sheet .nas-reminder-strip .nas-subhead { margin: 0 6px 0 0; }
+.nas-sheet .nas-reminder-chip {
+  padding: 3px 10px;
+  border: 1px solid var(--na-line);
+  border-radius: 14px;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.3);
+}
+.nas-sheet .nas-reminder-chip small { color: var(--na-muted); }
+.nas-sheet .nas-reminder-chip.nas-reminder-vantagem { border-color: var(--na-calm); }
+.nas-sheet .nas-reminder-chip.nas-reminder-desvantagem { border-color: var(--na-red-hot); }
+@container (max-width: 1060px) {
+  .nas-sheet .nas-reminder-form { grid-template-columns: 1fr 1fr; }
+}
+
+.nas-dialog-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.nas-reminders { margin: 0; padding: 6px 10px 8px; border: 1px solid var(--color-border, #7a6a55); border-radius: 4px; }
+.nas-reminders legend { padding: 0 4px; font-weight: 700; }
+.nas-reminders ul { margin: 0 0 4px; padding: 0; list-style: none; display: grid; gap: 2px; }
+.nas-reminders li.is-adv { color: #3fbf9f; }
+.nas-reminders li.is-dis { color: #e8505a; }
+.nas-reminder-option { display: flex; align-items: center; gap: 8px; padding: 2px 0; cursor: pointer; }
+.nas-reminder-option small, .nas-reminders small { opacity: 0.8; }
+.nas-check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.nas-check small { opacity: 0.8; }
+.nas-cd.is-success { color: #3fbf9f; font-weight: 700; }
+.nas-cd.is-failure { color: #e8505a; font-weight: 700; }
+.nas-hit-confirm .nas-hit-total { display: grid; justify-items: center; padding: 6px; }
+.nas-hit-confirm .nas-hit-total strong { font-family: "Cinzel", Georgia, serif; font-size: 34px; line-height: 1; }
+.nas-hit-confirm .nas-crit { color: #e8323e; }
+
+.nas-damage-dialog .nas-dmg-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.nas-damage-dialog .nas-dmg-head span { display: flex; align-items: center; gap: 6px; }
+.nas-damage-dialog .nas-dmg-head select { max-width: 170px; }
+.nas-damage-dialog .nas-dmg-entries { display: grid; gap: 8px; max-height: 320px; overflow-y: auto; }
+.nas-damage-dialog .nas-dmg-entry { display: grid; gap: 4px; padding: 8px; border: 1px solid var(--color-border, #7a6a55); border-radius: 4px; }
+.nas-damage-dialog .nas-dmg-entry-bar { display: grid; grid-template-columns: minmax(0, 1fr) 80px 32px; gap: 6px; }
+.nas-damage-dialog .nas-dmg-attrs { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; }
+.nas-damage-dialog .nas-dmg-attrs label { display: inline-flex; align-items: center; gap: 3px; }
+.nas-damage-dialog .nas-dmg-types summary { cursor: pointer; font-size: 12px; }
+.nas-damage-dialog .nas-dmg-types summary span { opacity: 0.8; }
+.nas-damage-dialog .nas-dmg-types label { display: inline-flex; align-items: center; gap: 3px; margin: 2px 8px 0 0; font-size: 12px; }
+.nas-damage-dialog .nas-dmg-preview { margin: 0; }
+.nas-damage-dialog .nas-dmg-preview code { font-size: 13px; }
+.nas-damage-dialog .nas-dmg-preview code.is-invalid { color: #e8505a; }
+
+/* passivas da Respiração */
+.nas-sheet .nas-passives { display: grid; gap: 6px; }
+.nas-sheet .nas-passive { border: 1px solid var(--na-line); border-left: 3px solid var(--na-muted); border-radius: 4px; background: rgba(0, 0, 0, 0.25); }
+.nas-sheet .nas-passive.is-auto { border-left-color: var(--na-gold); }
+.nas-sheet .nas-passive summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  list-style: none;
+}
+.nas-sheet .nas-passive summary::-webkit-details-marker { display: none; }
+.nas-sheet .nas-passive summary::before { content: "\25B8"; color: var(--na-gold); transition: transform 0.15s; }
+.nas-sheet .nas-passive[open] summary::before { transform: rotate(90deg); }
+.nas-sheet .nas-passive-tag { padding: 1px 8px; border: 1px solid var(--na-line); border-radius: 10px; font-size: 11px; color: var(--na-muted); }
+.nas-sheet .nas-passive.is-auto .nas-passive-tag { border-color: var(--na-gold); color: var(--na-gold-soft); }
+.nas-sheet .nas-passive-state { flex: 1 1 260px; font-size: 13px; color: #d9cfc4; }
+.nas-sheet .nas-passive-text { padding: 0 12px 10px 26px; white-space: pre-wrap; font-size: 12.5px; line-height: 1.45; color: #cfc5ba; max-height: 280px; overflow-y: auto; }
+
+/* cartão de ataque no chat */
+.nas-attack-card.is-crit { border-left: 3px solid #e8323e; padding-left: 6px; }
+.nas-chat-card .nas-crit { margin: 4px 0; font-weight: 700; color: #e8323e; }
