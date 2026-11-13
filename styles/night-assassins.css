@@ -1,695 +1,719 @@
-/* Night Assassins Rebirth, prototype stylesheet scoped strictly to its sheet. */
+/* Night Assassins — ficha Slayer. Escopo estrito em .nas-sheet.
+   Tokens amostrados dos mockups aprovados em assets/references/ (03 e 07). */
 .nas-sheet {
-  --nas-bg: #080c10;
-  --nas-surface: #0f151a;
-  --nas-panel: #111821;
-  --nas-border: #6f4f31;
-  --nas-gold: #d1a76b;
-  --nas-ivory: #e7dfd1;
-  --nas-muted: #b1a99f;
-  --nas-red: #ba263d;
-  --nas-blue: #168cc4;
-  color: var(--nas-ivory);
-  background: #070b0f;
-  min-width: 860px;
-  min-height: 620px;
+  --na-bg: #0b0708;
+  --na-bg-glow: rgba(199, 15, 26, 0.16);
+  --na-panel: #120c0d;
+  --na-panel-2: #1a1112;
+  --na-line: rgba(215, 149, 75, 0.32);
+  --na-line-strong: rgba(215, 149, 75, 0.62);
+  --na-gold: #d7954b;
+  --na-gold-soft: #e9c08a;
+  --na-red: #c70f1a;
+  --na-red-hot: #e8323e;
+  --na-blue: #0498eb;
+  --na-folego: #e0a84a;
+  --na-calm: #2bb8a3;
+  --na-text: #f4efe8;
+  --na-muted: #a39489;
+  --na-radius: 6px;
+  --na-display: "Cinzel", Georgia, "Times New Roman", serif;
+  --na-body: "Signika", "Trebuchet MS", system-ui, sans-serif;
+  color: var(--na-text);
+  font-family: var(--na-body);
+  min-width: 960px;
+  min-height: 640px;
 }
 
 .nas-sheet .window-content {
   padding: 0;
   overflow: hidden;
-  background: var(--nas-bg)
+  container-type: inline-size;
+  background:
+    radial-gradient(120% 70% at 50% -10%, var(--na-bg-glow), transparent 60%),
+    radial-gradient(60% 50% at 100% 100%, rgba(215, 149, 75, 0.06), transparent 70%),
+    var(--na-bg);
 }
 
-.nas-sheet button,
-.nas-sheet select,
-.nas-sheet input {
-  font: inherit
+/* ---------- reset local de controles ---------- */
+.nas-sheet :is(button, select, input) {
+  font: inherit;
+  color: inherit;
 }
-
+.nas-sheet input,
+.nas-sheet select {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--na-line);
+  border-radius: 4px;
+  color: var(--na-text);
+}
+.nas-sheet input:disabled,
+.nas-sheet select:disabled {
+  opacity: 0.85;
+  border-color: transparent;
+}
 .nas-sheet button {
   cursor: pointer;
-  color: inherit
+  background: linear-gradient(180deg, #1f1516, #140d0e);
+  border: 1px solid var(--na-line);
+  border-radius: 4px;
+  color: var(--na-text);
+  line-height: 1.2;
+}
+.nas-sheet button:hover {
+  border-color: var(--na-line-strong);
+  box-shadow: 0 0 10px rgba(215, 149, 75, 0.18);
+}
+.nas-sheet :is(button, input, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--na-gold);
+  outline-offset: 2px;
+}
+.nas-sheet .nas-muted {
+  color: var(--na-muted);
 }
 
-.nas-sheet button:focus-visible,
-.nas-sheet input:focus-visible,
-.nas-sheet select:focus-visible {
-  outline: 2px solid #f2d295;
-  outline-offset: 2px
-}
-
+/* ---------- casca: identidade | área de trabalho | trilho ---------- */
 .nas-sheet .nas-app {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: radial-gradient(circle at 60% 10%, #20202a 0, transparent 48%), var(--nas-bg);
-  font-family: Georgia, serif
-}
-
-.nas-sheet .nas-masthead {
-  height: 56px;
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  border-bottom: 1px solid var(--nas-border);
-  background: #080c10
-}
-
-.nas-sheet .nas-brand {
-  text-align: center;
-  letter-spacing: .15em;
-  line-height: 1
-}
-
-.nas-sheet .nas-brand strong {
-  display: block;
-  color: #e3c396;
-  font-size: 23px;
-  font-weight: 500
-}
-
-.nas-sheet .nas-brand small {
-  display: block;
-  margin-top: 5px;
-  color: #ac9584;
-  font: 10px sans-serif;
-  letter-spacing: .22em
-}
-
-.nas-sheet .nas-masthead-ornament {
-  max-width: 180px;
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--nas-border), transparent)
-}
-
-.nas-sheet .nas-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 27%) minmax(0, 1fr) 104px;
-  gap: 12px;
-  min-height: 0;
+  grid-template-columns: minmax(250px, 22%) minmax(0, 1fr) 218px;
+  gap: 16px;
   flex: 1;
-  padding: 10px
+  height: 100%;
+  min-height: 0;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
+/* identidade */
 .nas-sheet .nas-identity {
   display: flex;
   flex-direction: column;
+  gap: 12px;
   min-height: 0;
-  overflow: hidden;
-  border: 1px solid var(--nas-border);
-  background: linear-gradient(#121318, #080b11)
 }
-
-.nas-sheet .nas-workspace-header {
+.nas-sheet .nas-identity-head {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  flex: none;
-  padding: 6px 4px
+  gap: 12px;
+  align-items: stretch;
 }
-
-.nas-sheet .nas-seal {
+.nas-sheet .nas-level {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  flex: none;
+  padding: 6px 4px;
+  border: 1px solid var(--na-line-strong);
+  border-radius: var(--na-radius);
+  background: linear-gradient(180deg, #1c1213, #0e0909);
+  font-family: var(--na-display);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-level input {
+  width: 100%;
+  height: auto;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-family: var(--na-display);
+  font-size: 28px;
+  color: var(--na-text);
+}
+.nas-sheet .nas-name {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-width: 58px;
-  font-size: 11px;
-  color: var(--nas-gold);
-  text-transform: uppercase
-}
-
-.nas-sheet .nas-seal input {
-  width: 62px;
-  background: transparent;
-  border: 1px solid var(--nas-border);
-  text-align: center;
-  color: var(--nas-ivory);
-  font-size: 26px;
-  padding: 3px 0
-}
-
-.nas-sheet .nas-workspace-name {
+  justify-content: center;
   min-width: 0;
-  flex: 1
 }
-
-.nas-sheet .nas-workspace-name input {
-  width: 100%;
-  color: var(--nas-ivory);
+.nas-sheet .nas-name-input {
+  height: auto;
+  padding: 2px 4px;
+  border-color: transparent;
   background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--nas-border);
-  font-size: 23px;
-  padding: 2px 4px
+  font-family: var(--na-display);
+  font-size: 24px;
+  letter-spacing: 0.03em;
 }
-
-.nas-sheet .nas-workspace-name span {
-  display: block;
-  color: var(--nas-muted);
-  font: 12px sans-serif;
-  margin-top: 6px
+.nas-sheet .nas-name-input:hover:not(:disabled) {
+  border-color: var(--na-line);
 }
-
-.nas-sheet .nas-portrait {
-  flex: 1;
-  min-height: 200px;
-  position: relative;
+.nas-sheet .nas-name-sub {
+  padding: 0 4px;
+  font-size: 13px;
+  color: var(--na-gold-soft);
+  white-space: nowrap;
   overflow: hidden;
-  background: linear-gradient(130deg, #2c1318, #0c1620)
+  text-overflow: ellipsis;
 }
-
+.nas-sheet .nas-portrait {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  border: 1px solid var(--na-line-strong);
+  border-radius: var(--na-radius);
+  overflow: hidden;
+  background: #060404;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 0 18px rgba(199, 15, 26, 0.12);
+}
 .nas-sheet .nas-portrait img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top
+  border: 0;
+  display: block;
 }
-
-.nas-sheet .nas-portrait img[data-action] {
-  cursor: pointer
+.nas-sheet .nas-portrait img[data-edit] {
+  cursor: pointer;
 }
-
-.nas-sheet .nas-portrait-edit {
+.nas-sheet .nas-portrait-label {
   position: absolute;
-  bottom: 12px;
-  left: 12px;
-  padding: 7px 11px;
-  background: #1118;
-  border: 1px solid var(--nas-gold);
-  font-size: 12px;
-  pointer-events: none
+  left: 10px;
+  bottom: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--na-line);
+  border-radius: 4px;
+  background: rgba(8, 5, 5, 0.78);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--na-muted);
+  pointer-events: none;
 }
 
-.nas-sheet .nas-portrait-quote {
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: center;
-  color: #c5b6a4;
-  padding: 12px 6px;
-  min-height: 62px
-}
-
+/* área de trabalho */
 .nas-sheet .nas-workspace {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
   min-width: 0;
   min-height: 0;
-  gap: 12px
 }
-
 .nas-sheet .nas-topbar {
-  display: flex;
-  min-height: 130px;
-  flex: none;
-  gap: 12px
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 14px;
 }
-
-.nas-sheet .nas-resource-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  min-width: 0;
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid var(--nas-border)
+.nas-sheet .nas-resources {
+  display: grid;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--na-line);
+  border-radius: var(--na-radius);
+  background: var(--na-panel);
 }
-
 .nas-sheet .nas-resource {
-  display: flex;
+  --nas-res: var(--na-red-hot);
+  display: grid;
+  grid-template-columns: 18px 64px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
-  min-width: 0;
-  font: 12px sans-serif
 }
-
+.nas-sheet .nas-resource-pdr {
+  --nas-res: var(--na-blue);
+}
+.nas-sheet .nas-resource-folego {
+  --nas-res: var(--na-folego);
+}
+.nas-sheet .nas-resource-icon {
+  color: var(--nas-res);
+  text-align: center;
+}
 .nas-sheet .nas-resource-label {
-  font-weight: 700;
-  width: 54px;
-  text-transform: uppercase
+  font-family: var(--na-display);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--nas-res);
 }
-
-.nas-sheet .nas-resource-pdv .nas-resource-label {
-  color: #ef5c6a
-}
-
-.nas-sheet .nas-resource-pdr .nas-resource-label {
-  color: #44beff
-}
-
-.nas-sheet .nas-resource-folego .nas-resource-label {
-  color: #ebbf65
-}
-
 .nas-sheet .nas-resource-track {
-  height: 19px;
-  background: linear-gradient(#080c11, #171b25);
-  border: 1px solid #554339;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden
+  height: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.55);
+  overflow: hidden;
 }
-
 .nas-sheet .nas-resource-fill {
   height: 100%;
-  background: linear-gradient(90deg, #9f172d, #ed4f69)
+  background: linear-gradient(90deg, color-mix(in srgb, var(--nas-res) 70%, black), var(--nas-res));
+  box-shadow: 0 0 8px var(--nas-res);
 }
-
-.nas-sheet .nas-resource-pdr .nas-resource-fill {
-  background: linear-gradient(90deg, #0b5d9e, #22bfff)
-}
-
-.nas-sheet .nas-resource-folego .nas-resource-fill {
-  background: linear-gradient(90deg, #946423, #e6ae4c)
-}
-
 .nas-sheet .nas-resource-values {
   display: flex;
   align-items: center;
-  white-space: nowrap;
-  color: var(--nas-muted)
+  gap: 4px;
+  color: var(--na-muted);
 }
-
 .nas-sheet .nas-resource-values input {
-  width: 43px;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: var(--nas-ivory);
-  font-size: 12px;
-  text-align: center
+  width: 44px;
+  height: 22px;
+  padding: 0 4px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
-
-.nas-sheet .nas-section-title {
+.nas-sheet .nas-section-badge {
   display: flex;
-  gap: 13px;
   align-items: center;
-  min-width: 250px;
-  flex: 0 0 30%;
-  background: linear-gradient(100deg, #25121a, #0a0d12);
-  border: 1px solid var(--nas-border);
-  padding: 14px
+  gap: 14px;
+  padding: 10px 16px;
+  border: 1px solid var(--na-line);
+  border-radius: var(--na-radius);
+  background:
+    radial-gradient(90% 120% at 0% 50%, rgba(199, 15, 26, 0.32), transparent 70%),
+    var(--na-panel);
 }
-
-.nas-sheet .nas-section-title>i {
-  font-size: 32px;
-  color: #f14b61
+.nas-sheet .nas-emblem {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  flex: none;
+  border: 2px solid var(--na-red-hot);
+  border-radius: 50%;
+  background: radial-gradient(circle, #3a0b0f, #120708);
+  box-shadow: 0 0 16px rgba(232, 50, 62, 0.45);
+  font-size: 22px;
+  color: var(--na-text);
 }
-
-.nas-sheet .nas-section-title h2 {
-  font-size: 24px;
-  letter-spacing: .14em;
+.nas-sheet .nas-section-badge > div {
+  min-width: 0;
+}
+.nas-sheet .nas-section-badge h2 {
+  margin: 0;
+  border: 0;
+  font-family: var(--na-display);
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-transform: uppercase;
-  color: var(--nas-gold);
-  margin: 0
+  color: var(--na-text);
 }
-
-.nas-sheet .nas-section-title span {
-  font: 12px sans-serif;
-  color: #ddd0bf
+.nas-sheet .nas-section-badge span {
+  font-size: 13px;
+  color: var(--na-muted);
 }
-
 .nas-sheet .nas-main {
-  flex: 1;
-  overflow: auto;
-  min-height: 0;
-  padding-right: 4px;
-  scrollbar-color: #8a533a #10151d
-}
-
-.nas-sheet .nas-section {
-  border: 1px solid var(--nas-border);
-  background: #0b1117e6;
-  padding: 14px;
-  margin-bottom: 12px
-}
-
-.nas-sheet .nas-section h3 {
-  margin: 0 0 12px;
-  padding-bottom: 7px;
-  border-bottom: 1px solid #67513f;
-  color: var(--nas-gold);
-  font-size: 14px;
-  letter-spacing: .1em
-}
-
-.nas-sheet .nas-section h3 span {
-  float: right;
-  text-transform: none;
-  font: 11px sans-serif;
-  letter-spacing: 0;
-  color: var(--nas-muted)
-}
-
-.nas-sheet .nas-attribute-rail {
-  display: flex;
-  overflow-x: auto;
-  gap: 11px;
-  padding: 5px 3px 10px;
-  scrollbar-color: var(--nas-gold) #121820
-}
-
-.nas-sheet .nas-attribute {
-  border: 1px solid var(--nas-accent, #b6a18e);
-  border-radius: 3px;
-  background: linear-gradient(#1b1820, #0b1319);
   display: flex;
   flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* ---------- painéis ---------- */
+.nas-sheet .nas-panel {
+  padding: 12px 14px 14px;
+  border: 1px solid var(--na-line);
+  border-radius: var(--na-radius);
+  background: linear-gradient(180deg, var(--na-panel-2), var(--na-panel));
+}
+.nas-sheet .nas-panel-fill {
+  flex: 1;
+}
+.nas-sheet .nas-panel-title {
+  display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--na-line);
+  font-family: var(--na-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--na-text);
+}
+.nas-sheet .nas-panel-title > i {
+  color: var(--na-gold);
+}
+.nas-sheet .nas-panel-meta {
+  margin-left: auto;
+  font-family: var(--na-body);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-panel-danger {
+  border-color: rgba(232, 50, 62, 0.45);
+  background: linear-gradient(180deg, #241012, #140a0b);
+}
+.nas-sheet .nas-panel-danger .nas-panel-title > i,
+.nas-sheet .nas-panel-danger .nas-empty > i {
+  color: var(--na-red-hot);
+}
+.nas-sheet .nas-panel-calm {
+  border-color: rgba(43, 184, 163, 0.45);
+  background: linear-gradient(180deg, #0f1c1b, #0b1212);
+}
+.nas-sheet .nas-panel-calm .nas-panel-title > i,
+.nas-sheet .nas-panel-calm .nas-empty > i {
+  color: var(--na-calm);
+}
+.nas-sheet .nas-grid {
+  display: grid;
+  gap: 14px;
+}
+.nas-sheet .nas-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.nas-sheet .nas-grid-main-side {
+  grid-template-columns: minmax(0, 1fr) 240px;
+}
+.nas-sheet .nas-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+}
+
+/* estado vazio */
+.nas-sheet .nas-empty {
+  display: grid;
+  justify-items: center;
   gap: 6px;
-  min-width: 106px;
-  min-height: 130px;
-  box-shadow: inset 0 0 16px #09090a
+  padding: 18px 12px;
+  text-align: center;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-empty > i {
+  font-size: 26px;
+  color: var(--na-gold);
+  opacity: 0.7;
+}
+.nas-sheet .nas-empty strong {
+  font-family: var(--na-display);
+  letter-spacing: 0.06em;
+  color: var(--na-text);
+}
+.nas-sheet .nas-empty p {
+  margin: 0;
+  font-size: 13px;
+}
+.nas-sheet .nas-empty-row {
+  grid-template-columns: auto 1fr;
+  justify-items: start;
+  text-align: left;
+  gap: 14px;
+}
+.nas-sheet .nas-empty-large {
+  padding: 60px 12px;
+}
+.nas-sheet .nas-empty-large > i {
+  font-size: 40px;
 }
 
-.nas-sheet .nas-attribute label,
-.nas-sheet .nas-attribute span {
-  color: var(--nas-accent);
-  font-size: 15px
+/* ---------- atributos ---------- */
+.nas-sheet .nas-attribute-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(104px, 1fr);
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
-
+.nas-sheet .nas-attribute {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: end;
+  gap: 2px 6px;
+  padding: 10px 10px 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--nas-accent) 55%, transparent);
+  border-radius: var(--na-radius);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--nas-accent) 22%, transparent), transparent 70%),
+    #0e0909;
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--nas-accent) 12%, transparent);
+}
+.nas-sheet .nas-attribute label {
+  grid-column: 1 / -1;
+  font-family: var(--na-display);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--na-text);
+}
 .nas-sheet .nas-attribute input {
-  width: 76px;
+  width: 100%;
+  height: auto;
+  padding: 0;
   border: 0;
   background: transparent;
+  font-family: var(--na-display);
+  font-size: 32px;
+  line-height: 1;
   color: var(--nas-accent);
-  font-size: 35px;
-  text-align: center
+  text-shadow: 0 0 12px color-mix(in srgb, var(--nas-accent) 50%, transparent);
 }
-
-.nas-sheet .nas-attribute strong {
-  font-size: 36px;
+.nas-sheet .nas-die {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-color: color-mix(in srgb, var(--nas-accent) 45%, transparent);
+  font-size: 15px;
+  color: var(--na-text);
+}
+.nas-sheet .nas-attribute-test {
+  height: auto;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.nas-sheet .nas-attribute-test .nas-attr-label {
+  font-family: var(--na-display);
+  letter-spacing: 0.1em;
+}
+.nas-sheet .nas-attribute-test strong {
+  font-family: var(--na-display);
+  font-size: 32px;
+  line-height: 1;
   color: var(--nas-accent);
-  font-weight: 500
 }
-
-.nas-sheet .nas-attribute button {
-  min-width: 80px;
-  border: 1px solid #7b674f;
-  background: #0e151a;
-  padding: 4px;
-  font-size: 12px
-}
-
-.nas-sheet .nas-attribute small {
-  font: 11px sans-serif;
-  color: var(--nas-ivory)
-}
-
-.nas-sheet .nas-attribute-rail-compact .nas-attribute {
-  min-width: 100px
-}
-
-.nas-sheet .nas-two-up {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px
-}
-
-.nas-sheet .nas-two-up.nas-section {
-  display: grid
-}
-
-.nas-sheet .nas-fieldset {
-  background: #10151a;
-  border: 1px solid #5c483c;
-  padding: 15px;
-  min-width: 0
-}
-
-.nas-sheet .nas-fieldset label {
-  display: block;
-  font: 13px sans-serif;
-  margin: 0 0 12px;
-  color: var(--nas-gold)
-}
-
-.nas-sheet .nas-fieldset input,
-.nas-sheet .nas-fieldset select {
-  display: block;
-  margin-top: 6px;
+.nas-sheet .nas-attr-cta {
   width: 100%;
-  background: #0b1014;
-  color: var(--nas-ivory);
-  border: 1px solid #66513b;
-  padding: 8px 10px
-}
-
-.nas-sheet .nas-fieldset p {
-  color: #d2c5b3;
-  line-height: 1.6;
-  font-size: 13px
-}
-
-.nas-sheet .nas-muted {
-  color: #b9a8a0;
+  padding: 3px 0;
+  border: 1px solid color-mix(in srgb, var(--nas-accent) 45%, transparent);
+  border-radius: 3px;
   font-size: 12px;
-  line-height: 1.5
 }
 
-.nas-sheet .nas-action-row {
+/* ---------- persona / respiração ---------- */
+.nas-sheet .nas-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+.nas-sheet .nas-fields label {
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-fields :is(input, select) {
+  height: 30px;
+  font-size: 14px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.nas-sheet .nas-breath {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px
+  align-items: center;
+  gap: 14px;
+}
+.nas-sheet .nas-breath img {
+  width: 88px;
+  height: 88px;
+  flex: none;
+  object-fit: cover;
+  border: 1px solid var(--na-line);
+  border-radius: var(--na-radius);
+}
+.nas-sheet .nas-breath strong {
+  display: block;
+  font-family: var(--na-display);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+}
+.nas-sheet .nas-breath span {
+  font-size: 13px;
 }
 
-.nas-sheet .nas-action-row button,
-.nas-sheet .nas-state-actions button,
-.nas-sheet .nas-fieldset button,
-.nas-sheet .nas-section>button {
-  background: #121a20;
-  color: var(--nas-ivory);
-  border: 1px solid #806344;
-  padding: 11px 14px
+/* ---------- combate / estados ---------- */
+.nas-sheet .nas-stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+.nas-sheet .nas-stat-row-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.nas-sheet .nas-stat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--na-line);
+  border-radius: var(--na-radius);
+  background: var(--na-panel);
+}
+.nas-sheet .nas-stat > i {
+  grid-row: 1 / -1;
+  font-size: 24px;
+  color: var(--na-gold);
+}
+.nas-sheet .nas-stat span {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-stat strong {
+  font-family: var(--na-display);
+  font-size: 24px;
+  line-height: 1.1;
+}
+.nas-sheet .nas-quick {
+  display: grid;
+  gap: 8px;
+}
+.nas-sheet .nas-quick button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  text-align: left;
+}
+.nas-sheet .nas-quick button i {
+  width: 18px;
+  color: var(--na-gold);
+  text-align: center;
+}
+.nas-sheet .nas-readouts {
+  display: grid;
+  margin: 0;
+}
+.nas-sheet .nas-readouts > div {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+  padding: 7px 2px;
+  border-bottom: 1px solid rgba(215, 149, 75, 0.12);
+}
+.nas-sheet .nas-readouts dt {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--na-muted);
+}
+.nas-sheet .nas-readouts dd {
+  margin: 0;
 }
 
-.nas-sheet .nas-action-row button:hover,
-.nas-sheet .nas-state-actions button:hover,
-.nas-sheet .nas-nav-item:hover {
-  background: #392027
-}
-
+/* ---------- perícias ---------- */
 .nas-sheet .nas-skill-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px
+  gap: 8px;
 }
-
-.nas-sheet .nas-skill-grid button {
+.nas-sheet .nas-skill {
   display: flex;
   align-items: center;
-  gap: 9px;
-  text-align: left;
-  font-size: 12px;
-  padding: 9px;
-  border: 1px solid #4b4440;
-  background: #0c1318;
-  color: #ded0be
-}
-
-.nas-sheet .nas-skill-grid button i {
-  color: #b82736
-}
-
-.nas-sheet .nas-state-layout {
-  display: grid;
-  grid-template-columns: 35% 1fr;
-  gap: 14px
-}
-
-.nas-sheet .nas-state-actions {
-  display: grid;
-  gap: 7px
-}
-
-.nas-sheet .nas-state-readouts {
-  display: grid;
-  align-content: start;
-  gap: 8px
-}
-
-.nas-sheet .nas-state-readouts div {
-  padding: 12px;
-  border: 1px solid #514235;
-  display: flex;
   justify-content: space-between;
-  font-size: 12px
+  gap: 8px;
+  padding: 7px 10px;
+  text-align: left;
+}
+.nas-sheet .nas-skill em {
+  padding: 1px 6px;
+  border: 1px solid color-mix(in srgb, var(--nas-accent) 55%, transparent);
+  border-radius: 3px;
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  color: var(--nas-accent);
 }
 
-.nas-sheet .nas-state-readouts small {
-  color: var(--nas-muted)
-}
-
-.nas-sheet .nas-empty {
-  min-height: 220px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  text-align: center
-}
-
-.nas-sheet .nas-empty>i {
-  font-size: 30px;
-  color: var(--nas-gold)
-}
-
-.nas-sheet .nas-empty p {
-  color: var(--nas-muted);
-  max-width: 320px;
-  font-size: 13px
-}
-
+/* ---------- diário ---------- */
 .nas-sheet .nas-journal {
-  min-height: 420px;
-  background: linear-gradient(110deg, #d8c6aa, #b7a387);
-  color: #24150f;
-  padding: 20px 25px;
-  border: 3px double #785a40;
-  font-family: Georgia, serif;
-  box-shadow: inset 0 0 55px #67402535
+  flex: 1;
+}
+.nas-sheet .nas-paper {
+  border-color: rgba(233, 192, 138, 0.35);
+  background:
+    linear-gradient(180deg, rgba(233, 192, 138, 0.07), transparent 40%),
+    #15100d;
 }
 
-.nas-sheet .nas-journal-title {
-  text-align: center;
-  border-bottom: 5px double #49301e;
-  padding: 9px 0 16px
-}
-
-.nas-sheet .nas-journal-title small {
-  font-size: 10px;
-  letter-spacing: .14em
-}
-
-.nas-sheet .nas-journal-title h3 {
-  font-size: 35px;
-  color: #21150f;
-  line-height: 1.2;
-  margin: 12px 0 8px
-}
-
-.nas-sheet .nas-journal-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px
-}
-
-.nas-sheet .nas-journal-columns article {
-  min-height: 240px;
-  border-right: 1px solid #8f765d;
-  padding: 18px 12px
-}
-
-.nas-sheet .nas-journal-columns h4 {
-  border-bottom: 2px solid #644631;
-  font-size: 18px;
-  margin: 0 0 14px
-}
-
-.nas-sheet .nas-journal-columns p {
-  font-size: 13px;
-  line-height: 1.65
-}
-
-.nas-sheet .nas-journal-columns button {
-  color: #24150f;
-  background: transparent;
-  border: 1px solid #654630;
-  padding: 7px 10px
-}
-
+/* ---------- trilho de navegação ---------- */
 .nas-sheet .nas-navigation {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 8px;
+  border-left: 1px solid var(--na-line);
   min-height: 0;
-  padding: 6px 0 6px 4px;
-  border-left: 1px solid #483a32
 }
-
 .nas-sheet .nas-nav-item {
   display: flex;
   align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  min-height: 70px;
-  border: 1px solid transparent;
-  background: transparent
+  gap: 12px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 40px 6px 6px 40px;
+  background: transparent;
+  text-align: left;
 }
-
+.nas-sheet .nas-nav-item:hover {
+  box-shadow: none;
+  background: rgba(215, 149, 75, 0.06);
+}
 .nas-sheet .nas-nav-icon {
-  border-radius: 50%;
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  border: 2px solid #a48b71;
-  box-shadow: inset 0 0 0 3px #16191e, 0 0 0 1px #30251d;
-  background: linear-gradient(#34343a, #12151a);
-  font-size: 18px
+  width: 58px;
+  height: 58px;
+  flex: none;
+  border: 2px solid rgba(215, 149, 75, 0.45);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #2a1d1b, #0d0909);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
+  font-size: 22px;
+  color: #d9cfc4;
 }
-
+.nas-sheet .nas-nav-text {
+  display: grid;
+  min-width: 0;
+}
 .nas-sheet .nas-nav-label {
-  font: 10px sans-serif;
-  text-align: center;
-  color: #e0d5c4
+  font-family: var(--na-display);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
-
 .nas-sheet .nas-nav-subtitle {
-  font: 9px sans-serif;
-  text-align: center;
-  color: #98908a;
-  margin-top: 2px
+  font-size: 11px;
+  color: var(--na-muted);
 }
-
+.nas-sheet .nas-nav-item.is-active {
+  background: linear-gradient(90deg, rgba(199, 15, 26, 0.28), transparent);
+}
 .nas-sheet .nas-nav-item.is-active .nas-nav-icon {
-  border-color: #f5cc85;
-  background: linear-gradient(#c53642, #4a0f19);
-  box-shadow: 0 0 19px #c9223355, inset 0 0 0 3px #1a0a11
+  border-color: var(--na-red-hot);
+  background: radial-gradient(circle at 50% 35%, #5a0d13, #1a0709);
+  box-shadow: 0 0 18px rgba(232, 50, 62, 0.55), inset 0 0 10px rgba(0, 0, 0, 0.6);
+  color: var(--na-text);
 }
 
-.nas-sheet .nas-nav-item.is-active .nas-nav-label {
-  color: #fb5a6c;
-  font-weight: 700
-}
-
-@media (max-width:1200px) {
-  .nas-sheet .nas-layout {
-    grid-template-columns: 225px minmax(0, 1fr) 82px;
-    gap: 6px
+/* ---------- janelas estreitas ---------- */
+@container (max-width: 1240px) {
+  .nas-sheet .nas-app {
+    grid-template-columns: 220px minmax(0, 1fr) 84px;
   }
-
-  .nas-sheet .nas-topbar {
-    flex-direction: column
+  .nas-sheet .nas-nav-text {
+    display: none;
   }
-
-  .nas-sheet .nas-section-title {
-    min-height: 60px;
-    flex: 0 0 auto
+  .nas-sheet .nas-nav-item {
+    justify-content: center;
+    border-radius: 50%;
   }
-
   .nas-sheet .nas-skill-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr))
-  }
-
-  .nas-sheet .nas-nav-label {
-    font-size: 9px
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
-@media (prefers-reduced-motion:no-preference) {
-
-  .nas-sheet .nas-nav-item,
-  .nas-sheet .nas-action-row button {
-    transition: background-color .16s ease, box-shadow .16s ease
+@container (max-width: 1060px) {
+  .nas-sheet .nas-topbar,
+  .nas-sheet .nas-grid-2,
+  .nas-sheet .nas-grid-main-side {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

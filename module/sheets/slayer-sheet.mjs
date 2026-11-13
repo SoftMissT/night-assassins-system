@@ -1,5 +1,6 @@
 /**
- * Rebirth phase 1: single navigation rail, no combat formulas.
+ * Rebirth phase 2: visual shell of the seven-tab Slayer sheet, no combat formulas.
+ * Values without an audited formula render as "—"; nothing here invents game data.
  * Architectural reference: Foundry v14 ActorSheetV2 + HandlebarsApplicationMixin.
  */
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -35,25 +36,58 @@ const ATTRIBUTES = Object.freeze([
   { id: "int", name: "INT", color: "#d5af57" },
   { id: "sab", name: "SAB", color: "#d3d0cd" },
 ]);
+/** Skill → attribute pairing as shown in the approved mockup 03-testes-corrigido; rules confirmation pending. */
 const SKILLS = Object.freeze([
-  "Arremesso",
-  "Atletismo",
-  "Arrombamento",
-  "Acrobacia",
-  "Corrida",
-  "História",
-  "Intuição",
-  "Religião",
-  "Foco",
-  "Adestramento",
-  "Percepção",
-  "Linguística",
-  "Sobrevivência",
-  "Enganação",
-  "Investigação",
-  "Presença",
-  "Etiqueta",
-  "Performance",
+  { name: "Arremesso", attr: "for" },
+  { name: "Atletismo", attr: "for" },
+  { name: "Arrombamento", attr: "dex" },
+  { name: "Acrobacia", attr: "dex" },
+  { name: "Corrida", attr: "dex" },
+  { name: "História", attr: "int" },
+  { name: "Intuição", attr: "sab" },
+  { name: "Religião", attr: "sab" },
+  { name: "Foco", attr: "fdv" },
+  { name: "Adestramento", attr: "fdv" },
+  { name: "Percepção", attr: "sab" },
+  { name: "Linguística", attr: "int" },
+  { name: "Sobrevivência", attr: "sab" },
+  { name: "Enganação", attr: "car" },
+  { name: "Investigação", attr: "int" },
+  { name: "Presença", attr: "car" },
+  { name: "Etiqueta", attr: "car" },
+  { name: "Performance", attr: "car" },
+]);
+/** Slugs of the bundled art in assets/icons/breathing/resp_<slug>.webp. */
+const BREATHING_ICONS = Object.freeze(
+  new Set(
+    "agua ameixeira amor aranha areia besta cerejeira chamas corvo cristal dragao eclipse estrelas flor grama inseto lobo lua luz macaco madeira magma metal nevasca neve nevoa pedra raposa sangue serpente sol som sombras sonhos tartaruga tempo tigre tinta tormenta trovao tubarao vagalume veneno vento".split(
+      " ",
+    ),
+  ),
+);
+const COMBAT_STATS = Object.freeze([
+  { label: "Acerto", icon: "fa-crosshairs" },
+  { label: "Bloqueio", icon: "fa-shield-halved" },
+  { label: "Esquiva", icon: "fa-person-running" },
+  { label: "Resistência", icon: "fa-shield-heart" },
+  { label: "Iniciativa", icon: "fa-angles-up" },
+]);
+const QUICK_ACTIONS = Object.freeze([
+  { label: "Ataque básico", icon: "fa-khanda" },
+  { label: "Bloqueio", icon: "fa-shield-halved" },
+  { label: "Esquiva", icon: "fa-person-running" },
+  { label: "Usar item", icon: "fa-flask" },
+  { label: "Passo rápido", icon: "fa-angles-right" },
+]);
+/** Per-turn action types from Mecanicas_Centrais §Tipos de Ação (Toemasa/Sistema). Épica is per campaign arc. */
+const ACTION_SLOTS = Object.freeze([
+  { label: "Movimento", icon: "fa-person-running" },
+  { label: "Ataque", icon: "fa-khanda" },
+  { label: "Especial", icon: "fa-wind" },
+  { label: "Única", icon: "fa-star" },
+  { label: "Completa", icon: "fa-circle-notch" },
+  { label: "Reação", icon: "fa-share" },
+  { label: "Épica", icon: "fa-crown" },
 ]);
 const NAV = Object.freeze([
   {
@@ -65,7 +99,7 @@ const NAV = Object.freeze([
   {
     id: "combate",
     name: "Combate",
-    icon: "fa-shield-halved",
+    icon: "fa-khanda",
     subtitle: "Arsenal e habilidades",
   },
   {
@@ -90,22 +124,36 @@ const NAV = Object.freeze([
     id: "diario",
     name: "Diário",
     icon: "fa-book-open",
-    subtitle: "Jornal de missões",
+    subtitle: "Missões e anotações",
   },
   {
     id: "configuracoes",
     name: "Configurações",
     icon: "fa-gear",
-    subtitle: "Opções da ficha",
+    subtitle: "Ajustes da ficha",
   },
 ]);
+
+/** "Respiração da Água" → "agua"; returns "" when no bundled icon matches. */
+function breathingSlug(text) {
+  const slug = String(text ?? "")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/^\s*respiracao\s+(da|do|de|das|dos)?\s*/, "")
+    .trim()
+    .replace(/s$/, "");
+  if (BREATHING_ICONS.has(slug)) return slug;
+  if (BREATHING_ICONS.has(`${slug}s`)) return `${slug}s`;
+  return "";
+}
 
 export class SlayerSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   _activeTab = "personagem";
 
   static DEFAULT_OPTIONS = {
     classes: ["nas-sheet"],
-    position: { width: 1440, height: 850 },
+    position: { width: 1440, height: 860 },
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
@@ -127,9 +175,9 @@ export class SlayerSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     const actor = this.document;
     const data = actor.system;
     const resources = [
-      { id: "pdv", name: "PDV", className: "pdv" },
-      { id: "pdr", name: "PDR", className: "pdr" },
-      { id: "folego", name: "Fôlego", className: "folego" },
+      { id: "pdv", name: "PDV", className: "pdv", icon: "fa-heart" },
+      { id: "pdr", name: "PDR", className: "pdr", icon: "fa-fire-flame-curved" },
+      { id: "folego", name: "Fôlego", className: "folego", icon: "fa-wind" },
     ].map((r) => {
       const values = data.resources[r.id];
       const percent =
@@ -138,6 +186,10 @@ export class SlayerSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
           : 0;
       return { ...r, value: values.value, max: values.max, percent };
     });
+    const attrName = Object.fromEntries(ATTRIBUTES.map((a) => [a.id, a]));
+    const className = CLASS_OPTIONS.find((c) => c.id === data.classId)?.name;
+    const originName = ORIGIN_OPTIONS.find((o) => o.id === data.originId)?.name;
+    const slug = breathingSlug(data.breathing);
 
     return {
       ...context,
@@ -154,7 +206,11 @@ export class SlayerSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         ...a,
         value: data.attributes[a.id],
       })),
-      skills: SKILLS,
+      skills: SKILLS.map((s) => ({
+        ...s,
+        attrLabel: attrName[s.attr].name,
+        color: attrName[s.attr].color,
+      })),
       classes: CLASS_OPTIONS.map((c) => ({
         ...c,
         selected: c.id === data.classId,
@@ -163,6 +219,18 @@ export class SlayerSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         ...o,
         selected: o.id === data.originId,
       })),
+      identityLine: [className ?? "Slayer", data.breathing, data.rank]
+        .filter(Boolean)
+        .join(" · "),
+      className: className ?? "",
+      originName: originName ?? "",
+      breathingIcon: slug
+        ? `systems/night-assassins/assets/icons/breathing/resp_${slug}.webp`
+        : "",
+      combatStats: COMBAT_STATS,
+      quickActions: QUICK_ACTIONS,
+      actionSlots: ACTION_SLOTS,
+      versions: { system: game.system.version, core: game.version },
     };
   }
 
