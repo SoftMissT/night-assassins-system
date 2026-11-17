@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [Não publicado]
 
+## [0.0.4] - 2026-11-17
+
+### Adicionado
+
+- **Compêndio Armas do Caçador:** 26 armas básicas e 17 especiais como Items nativos, com ícones, perfis de combate e dados por Rank do catálogo. As novas cópias de Item do compêndio e do seletor de inventário não carregam Dupla Alma.
+- **Origens e Habilidades Especiais vanilla:** criação usa Origens no `d22` e uma tabela combinada de Habilidades Especiais no `d100`. A face 98 permite escolher entre Marechi e Transformação Demoníaca vanilla. Mestre de Uma Coisa Só tem PDV/PDR próprios e marcos de Origem na ficha. Os IDs já gravados continuam com suas regras.
+
 ## [0.0.3] - 2026-11-13
 
 ### Adicionado

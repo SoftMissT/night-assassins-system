@@ -1,9 +1,18 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const base = new URL("../", import.meta.url);
 const file = relative => readFileSync(new URL(relative, base), "utf8");
+
+test("combat automation module parses before Foundry imports it", () => {
+  const path = fileURLToPath(new URL("module/apps/combat-actions.mjs", base));
+  const result = spawnSync(process.execPath, ["--check", path], { encoding: "utf8" });
+  assert.ifError(result.error);
+  assert.equal(result.status, 0, result.stderr);
+});
 
 // Version-neutral, safe static checks: do not require a Foundry world.
 test("manifest is a native v14 Foundry system with slayer subtype", () => {

@@ -24,6 +24,9 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Build weapon compendium
+        run: npm run build:weapon-pack
+
       - name: Validate version
         shell: bash
         run: |
@@ -57,6 +60,10 @@ jobs:
             test -d "$directory"
             cp -R "$directory" dist/system/
           done
+
+          mkdir -p dist/system/packs
+          cp -R packs/armas-cacador dist/system/packs/
+          rm -f dist/system/packs/armas-cacador/{LOCK,LOG,LOG.old}
 
           # mockups de design: fora do pacote Foundry
           rm -rf dist/system/assets/references

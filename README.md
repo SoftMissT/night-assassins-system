@@ -109,7 +109,10 @@ https://github.com/SoftMissT/night-assassins-system/releases/latest/download/sys
 
 ```bash
 npm test
+npm run build:weapon-pack
 ```
+
+O segundo comando gera **Armas do Caçador** em `packs/armas-cacador` a partir do catálogo do sistema. Rode antes de instalar um checkout no Foundry. No jogo, abra **Compêndios → Armas do Caçador** e arraste um Item para a ficha. O mesmo catálogo está em **Inventário → Arma do catálogo**.
 
 O sistema está sendo reconstruído sem
 dependência do Custom System Builder.

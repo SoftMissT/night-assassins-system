@@ -15,7 +15,7 @@ import {
 } from "../core/passives.mjs";
 import {
   WEAPONS, critThreshold, hitAttributes, isConcussion, isCritical, isProficient, nextStoneBreak, stoneCritThreshold,
-  weaponDamageFormula, weaponHitBonus,
+  weaponDamageFormula, weaponHitBonus, weaponItemData,
 } from "../core/weapons.mjs";
 import { messageModeField, postCard, rollToChat } from "./rolls.mjs";
 
@@ -708,8 +708,7 @@ export async function addWeaponFromCatalog(actor) {
   });
   const w = WEAPONS.find((x) => x.id === id);
   if (!w) return null;
-  const { id: catalogId, name, img, ...rest } = w;
-  return actor.createEmbeddedDocuments("Item", [{ name, img, type: "weapon", system: { ...rest, catalogId } }]);
+  return actor.createEmbeddedDocuments("Item", [weaponItemData(w)]);
 }
 
 /** Apply damage/healing to one Slayer actor, handling falls, Death Marks and statuses. */

@@ -13,6 +13,21 @@ export const findWeapon = (id) => WEAPONS.find((w) => w.id === id) ?? null;
 
 const RANK_LEVELS = [["SS", 12], ["S", 11], ["A", 8], ["B", 6], ["C", 4], ["D", 2]];
 
+/** Create a native Item from the weapon's combat profiles. Dupla Alma stays in the source catalog. */
+export function weaponItemData({ id, name, img, special, rule, ...system }) {
+    if (special) {
+        if (system.requirement?.includes('Estágio de Unificação')) system.requirement = '';
+        const pactProperties = ['Pacto das Almas', 'Pacto de Kegare', 'Vínculo Gêmeo', 'Vínculo de Herança'];
+        system.properties = system.properties.split(' / ').filter((p) => !pactProperties.includes(p)).join(' / ');
+        const pactDescription = system.description.indexOf(` ${special.entity} responde com `);
+        if (pactDescription >= 0) system.description = `${system.description.slice(0, pactDescription)}</p>`;
+        if (id === 'weal_and_woe_lancas_gemeas_de_obsidiana_umbral') {
+            system.description = '<p>Lanças gêmeas de obsidiana umbral.</p>';
+        }
+    }
+    return { name, img, type: 'weapon', system: { ...system, catalogId: id } };
+}
+
 /** Weapon rank of the bearer by character level ("" below level 2). */
 export function weaponRank(level) {
   return RANK_LEVELS.find(([, min]) => Number(level) >= min)?.[0] ?? "";

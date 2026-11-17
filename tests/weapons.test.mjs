@@ -1,8 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { basename, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
-  WEAPONS, attributeDamage, critThreshold, findWeapon, hitAttributes, isCritical, weaponDamageFormula, weaponHitBonus, weaponRank,
+  WEAPONS, attributeDamage, critThreshold, findWeapon, hitAttributes, isCritical, weaponDamageFormula, weaponHitBonus, weaponItemData, weaponRank,
 } from "../module/core/weapons.mjs";
 import { clampToMax } from "../module/core/combat.mjs";
 
@@ -17,6 +19,39 @@ test("weapon catalog: 26 basic + 17 special, every special has rank dice, every 
   assert.equal(specials.length, 17);
   for (const w of specials) assert.ok(Object.values(w.rankDice).every(Boolean), w.name);
   for (const w of WEAPONS) assert.ok(w.profiles.length >= 1, w.name);
+});
+
+test("compiled and inventory weapons share native data and art, with Dupla Alma kept out", () => {
+  const root = new URL("../", import.meta.url);
+  const manifest = JSON.parse(readFileSync(new URL("system.json", root), "utf8"));
+  const pack = manifest.packs.find(({ name }) => name === "armas-cacador");
+  assert.equal(pack.type, "Item");
+  assert.equal(pack.system, manifest.id);
+  assert.equal(pack.path, `packs/${pack.name}`);
+  assert.equal(pack.ownership.PLAYER, "OBSERVER");
+  for (const w of WEAPONS) {
+    const item = weaponItemData(w);
+    assert.equal(item.type, "weapon", w.name);
+    assert.equal(item.name, w.name);
+    assert.equal(item.img, w.img, w.name);
+    assert.ok(item.img.startsWith(`systems/${manifest.id}/`), w.name);
+    const icon = fileURLToPath(new URL(item.img.slice(`systems/${manifest.id}/`.length), root));
+    assert.ok(readdirSync(dirname(icon)).includes(basename(icon)), item.img);
+    assert.equal(item.system.catalogId, w.id);
+    assert.deepEqual(item.system.profiles, w.profiles, w.name);
+    assert.deepEqual(item.system.rankDice, w.rankDice, w.name);
+    assert.equal(item.system.crit, w.crit, w.name);
+    assert.equal(item.system.special, undefined, w.name);
+    assert.equal(item.system.rule, undefined, w.name);
+    if (w.special) {
+      assert.doesNotMatch(item.system.requirement, /Estágio de Unificação/);
+      assert.doesNotMatch(item.system.description, /responde com|A dominância define/);
+      assert.doesNotMatch(item.system.properties, /Pacto das Almas|Pacto de Kegare|Vínculo Gêmeo|Vínculo de Herança/);
+    } else {
+      assert.equal(item.system.requirement, w.requirement, w.name);
+      assert.equal(item.system.properties, w.properties, w.name);
+    }
+  }
 });
 
 test("weapon catalog mirrors the legacy count", { skip: existsSync(legacyFile) ? false : "legacy CSB checkout not found (set NAS_LEGACY)" }, () => {

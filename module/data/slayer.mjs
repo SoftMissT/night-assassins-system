@@ -27,6 +27,7 @@ export class SlayerData extends foundry.abstract.TypeDataModel {
       level: int(0, { min: 0, max: MAX_SLAYER_LEVEL }),
       proficientWeapon: new f.StringField({ initial: "" }),
       creation: new f.SchemaField({
+        catalogVersion: int(1, { min: 1 }),
         method: new f.StringField({ initial: "", blank: true, choices: ["", "standard", "roll", "discord"] }),
         pool: new f.ArrayField(new f.NumberField({ integer: true, min: 1 })),
         originMethod: new f.StringField({ initial: "" }),

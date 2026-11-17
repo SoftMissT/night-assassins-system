@@ -65,8 +65,8 @@
             <h3 class="nas-panel-title"><i class="fa-solid fa-user-ninja" aria-hidden="true"></i> Persona</h3>
             <dl class="nas-readouts">
               <div><dt>Patente</dt><dd>{{d.patente}}</dd></div>
-              <div><dt>Origem</dt><dd>{{#if originName}}{{originName}}{{#if system.creation.originMethod}} <small class="nas-muted">({{system.creation.originMethod}})</small>{{/if}}{{else}}—{{/if}}</dd></div>
-              <div><dt>Dom do Sangue</dt><dd>{{#if milestones.gift}}{{milestones.gift}}{{#if system.creation.giftMethod}} <small class="nas-muted">({{system.creation.giftMethod}})</small>{{/if}}{{else}}—{{/if}}</dd></div>
+              <div><dt>Origem</dt><dd>{{#if originName}}{{originName}}{{#if system.creation.originMethod}} <small class="nas-muted">({{system.creation.originMethod}}{{#if (eq system.creation.originMethod "rolada")}} · {{originDie}}{{/if}})</small>{{/if}}{{else}}—{{/if}}</dd></div>
+              <div><dt>Habilidade Especial</dt><dd>{{#if milestones.gift}}{{milestones.gift}}{{#if system.creation.giftMethod}} <small class="nas-muted">({{system.creation.giftMethod}})</small>{{/if}}{{#if milestones.giftEffect}}<br>{{milestones.giftEffect}}{{/if}}{{else}}—{{/if}}</dd></div>
               {{#if classShown}}<div><dt>Classe</dt><dd>{{#if className}}{{className}}{{#if d.classRank}} · Rank {{d.classRank}}{{/if}}{{else}}Escolha ao subir para o nível 4{{/if}}</dd></div>{{/if}}
               <div><dt>Arma proficiente</dt><dd>{{#if system.proficientWeapon}}{{system.proficientWeapon}}{{else}}—{{/if}}</dd></div>
               <div><dt>Metal e Cor</dt><dd>
@@ -91,7 +91,7 @@
             {{/if}}
             {{#if milestones.origin.length}}
               <p class="nas-subhead">Habilidades da Origem</p>
-              <ul class="nas-events">{{#each milestones.origin}}<li class="{{#unless unlocked}}is-locked{{/unless}}"><i class="fa-solid {{#if unlocked}}fa-check{{else}}fa-lock{{/if}}" aria-hidden="true"></i> {{name}} <small class="nas-muted">nível {{level}}</small></li>{{/each}}</ul>
+              <ul class="nas-events">{{#each milestones.origin}}<li class="{{#unless unlocked}}is-locked{{/unless}}"><i class="fa-solid {{#if unlocked}}fa-check{{else}}fa-lock{{/if}}" aria-hidden="true"></i> {{name}} <small class="nas-muted">nível {{level}}</small>{{#if effect}}<br>{{effect}}{{/if}}</li>{{/each}}</ul>
             {{/if}}
             {{#if notCreated}}<p class="nas-muted nas-note">Os marcos aparecem depois da criação.</p>{{/if}}
           </section>
@@ -455,7 +455,7 @@
               </div>
               <div class="nas-fields">
                 <label>Origem<select name="system.originId"><option value="">—</option>{{#each origins}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
-                <label>Dom do Sangue<select name="system.gift"><option value="">—</option>{{#each gifts}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+                <label>Habilidade Especial<select name="system.gift"><option value="">—</option>{{#each gifts}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
                 <label>Classe<select name="system.classId"><option value="">—</option>{{#each classes}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
                 <label>Respiração<select name="system.breathing"><option value="">—</option>{{#each breathings}}<option value="{{name}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
               </div>

@@ -52,19 +52,23 @@
       <h3 class="nas-panel-title"><i class="fa-solid fa-torii-gate" aria-hidden="true"></i> Origem</h3>
       <div class="nas-roll-or-choose">
         {{#if originCanRoll}}<button type="button" class="nas-primary" data-action="rollOrigin"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> {{originRollLabel}}</button>{{/if}}
-        {{#if originRolls.length}}<span class="nas-chances">d12: {{#each originRolls}}<strong>{{this}}</strong>{{#unless @last}} → {{/unless}}{{/each}} · {{originRollsLeft}} chance(s) restante(s)</span>{{/if}}
+        {{#if originRolls.length}}<span class="nas-chances">d22: {{#each originRolls}}<strong>{{this}}</strong>{{#unless @last}} → {{/unless}}{{/each}}{{#unless originLocked}} · {{originRollsLeft}} chance(s) restante(s){{/unless}}</span>{{/if}}
         {{#if originChoosable}}
           <label>Escolher <small>(o Mestre deixou)</small>
-            <select name="originChoice">
+            <select name="originChoice" {{#if originLocked}}disabled{{/if}} {{#if s.busy}}disabled{{/if}}>
               <option value="">—</option>
               {{#each originChoices}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
             </select>
           </label>
         {{else}}
-          <button type="button" data-action="askOrigin"><i class="fa-solid fa-hand" aria-hidden="true"></i> O Mestre deixou escolher?</button>
+          {{#unless originLocked}}<button type="button" data-action="askOrigin"><i class="fa-solid fa-hand" aria-hidden="true"></i> O Mestre deixou escolher?</button>{{/unless}}
         {{/if}}
       </div>
-      <p class="nas-muted nas-note">2 chances: se não gostar da 1ª, role de novo; a 2ª vale.</p>
+      {{#if originLocked}}
+        <p class="nas-muted nas-note">Origem definida antes da rolagem da Habilidade Especial.</p>
+      {{else}}
+        <p class="nas-muted nas-note">2 chances: se não gostar da 1ª, role de novo; a 2ª vale.</p>
+      {{/if}}
       {{#if origin}}
         <dl class="nas-readouts">
           <div><dt>Origem</dt><dd><strong>{{origin.name}}</strong> ({{lookup methodText s.originMethod}})</dd></div>
@@ -76,7 +80,7 @@
     {{/if}}
 
     {{#if isStep.[2]}}
-      <h3 class="nas-panel-title"><i class="fa-solid fa-droplet" aria-hidden="true"></i> Dom do Sangue</h3>
+      <h3 class="nas-panel-title"><i class="fa-solid fa-droplet" aria-hidden="true"></i> Habilidade Especial</h3>
       <div class="nas-roll-or-choose">
         <button type="button" class="nas-primary" data-action="rollGift" {{#if (eq s.giftMethod "rolado")}}disabled{{/if}} {{#if s.busy}}disabled{{/if}}><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Rolar {{giftDice}}d100 (fica o maior)</button>
         {{#if isGM}}
@@ -84,7 +88,7 @@
         {{/if}}
         {{#if giftChoosable}}
           <label>Escolher <small>(o Mestre deixou)</small>
-            <select name="giftChoice" {{#if (eq s.giftMethod "rolado")}}disabled{{/if}}>
+            <select name="giftChoice" {{#if (eq s.giftMethod "rolado")}}disabled{{/if}} {{#if s.busy}}disabled{{/if}}>
               <option value="">—</option>
               {{#each giftChoices}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
             </select>
@@ -94,9 +98,15 @@
         {{/if}}
       </div>
       <p class="nas-muted nas-note">2d100 por padrão; 3d100 para Descendente Perdido ou sangue antigo (decisão do Mestre). "Sem Habilidade" é resultado válido.</p>
+      {{#if rolledGiftChoices}}
+        <label class="nas-field-wide">Resultado 98 · Escolha sua Habilidade Especial
+          <select name="rolledGiftChoice"><option value="">Escolher…</option>{{#each rolledGiftChoices}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+        </label>
+      {{/if}}
       {{#if gift}}
         <dl class="nas-readouts">
-          <div><dt>Dom</dt><dd>{{#if s.giftRolls.length}}{{#each s.giftRolls}}{{this}} {{/each}}→ {{/if}}<strong>{{gift.name}}</strong> ({{gift.range}}, {{lookup methodText s.giftMethod}})</dd></div>
+          <div><dt>Habilidade</dt><dd>{{#if s.giftRolls.length}}{{#each s.giftRolls}}{{this}} {{/each}}→ {{/if}}<strong>{{gift.name}}</strong> ({{lookup methodText s.giftMethod}})</dd></div>
+          {{#if gift.effect}}<div><dt>Efeito</dt><dd>{{gift.effect}}</dd></div>{{/if}}
         </dl>
       {{/if}}
       {{#if needGiftAttr}}
@@ -135,7 +145,7 @@
       <dl class="nas-readouts">
         <div><dt>Patente</dt><dd>Aspirante a Exterminador</dd></div>
         <div><dt>Origem</dt><dd>{{origin.name}} ({{lookup methodText s.originMethod}})</dd></div>
-        <div><dt>Dom do Sangue</dt><dd>{{gift.name}} ({{lookup methodText s.giftMethod}})</dd></div>
+        <div><dt>Habilidade Especial</dt><dd>{{gift.name}} ({{lookup methodText s.giftMethod}})</dd></div>
         <div><dt>Respiração</dt><dd>{{s.breathing}}</dd></div>
         <div><dt>Arma proficiente</dt><dd>{{#if s.weapon}}{{s.weapon}}{{else}}—{{/if}}</dd></div>
         {{#if preview}}<div><dt>Nível 1</dt><dd>PDV {{preview.pdv}} · PDR {{preview.pdr}} · Fôlego {{preview.folego}}</dd></div>{{/if}}

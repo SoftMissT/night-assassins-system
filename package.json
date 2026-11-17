@@ -1,8 +1,11 @@
 {
   "name": "night-assassins-system",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "private": true,
   "engines": { "node": ">=20" },
-  "scripts": { "test": "node --test tests/*.test.mjs" }
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "build:weapon-pack": "node tools/build-weapon-pack-sources.mjs && npx --yes @foundryvtt/foundryvtt-cli@3.0.4 package pack --type System --id night-assassins --compendiumName armas-cacador --inputDirectory build/compendium/armas-cacador --outputDirectory packs"
+  }
 }

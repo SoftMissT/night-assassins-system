@@ -2,7 +2,8 @@
  * Slayer sheet: UI wiring only. Rules live in module/core; combat automation in module/apps/combat-actions.mjs.
  * Tabs use the native ApplicationV2#changeTab (no re-render on switch).
  */
-import { GIFTS, ORIGINS } from "../core/progression.mjs";
+import { GIFTS, ORIGINS, catalogName, originMilestones } from "../core/progression.mjs";
+import { CREATION_CATALOG_VERSION } from "../core/creation.mjs";
 import { BONUS_CHANNELS, CHANNEL_LABELS, METALS } from "../core/bonuses.mjs";
 import { BREATHINGS, damageLabel, formsFor } from "../core/breathing.mjs";
 import { COMBAT_TESTS, ROLL_MODES, manualTerm } from "../core/checks.mjs";
@@ -216,19 +217,18 @@ export class SlayerSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         current: level >= 1 ? levelEvents(level) : [],
         next: nextEvents,
         nextPatente: level >= 1 && level < 14 ? LEVELS[String(level + 1)]?.patente : null,
-        origin: d.origin ? [
-          { level: 1, name: d.origin.hab1, unlocked: level >= 1 },
-          { level: 6, name: d.origin.hab6, unlocked: level >= 6 },
-        ] : [],
-        gift: data.gift ? GIFTS[data.gift]?.name : null,
+        origin: originMilestones(d.origin, level),
+        gift: catalogName(data.gift, GIFTS[data.gift]),
+        giftEffect: GIFTS[data.gift]?.effect,
       },
-      origins: Object.entries(ORIGINS).map(([id, o]) => ({ id, name: `${o.d12}. ${o.name}`, selected: id === data.originId })),
-      gifts: Object.entries(GIFTS).map(([id, g]) => ({ id, name: `${g.range} · ${g.name}`, selected: id === data.gift })),
+      origins: Object.entries(ORIGINS).map(([id, o]) => ({ id, name: catalogName(id, o), selected: id === data.originId })),
+      gifts: Object.entries(GIFTS).map(([id, g]) => ({ id, name: catalogName(id, g), selected: id === data.gift })),
       classes: CLASS_OPTIONS.map((c) => ({ ...c, selected: c.id === data.classId })),
       breathings: BREATHINGS.map((x) => ({ name: x.name, selected: breathing?.name === x.name })),
       metals: Object.entries(METALS).map(([id, name]) => ({ id, name, selected: id === data.metal })),
       metalUnlocked: level >= 2,
-      originName: d.origin?.name ?? "",
+      originName: catalogName(data.originId, d.origin),
+      originDie: data.creation?.catalogVersion === CREATION_CATALOG_VERSION ? "d22" : "d12",
       versions: { system: game.system.version, core: game.version },
       reminders: (data.reminders ?? []).map((r) => ({ ...r, scopeLabel: REMINDER_SCOPES[r.scope] ?? r.scope, summary: reminderSummary(r), isManual: r.source === "manual" })),
       reminderScopes: Object.entries(REMINDER_SCOPES).map(([id, label]) => ({ id, label })),

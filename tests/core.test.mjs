@@ -65,7 +65,7 @@ test("Fôlego = 2 + FDV; class rank by level", () => {
 });
 
 test("all twelve d12 Origins are present with distinct rolls", () => {
-  const rolls = Object.values(ORIGINS).map((o) => o.d12).sort((a, b) => a - b);
+  const rolls = Object.values(ORIGINS).flatMap((o) => o.d12 ?? []).sort((a, b) => a - b);
   assert.deepEqual(rolls, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 });
 

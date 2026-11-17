@@ -1,16 +1,29 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  STANDARD_POOL, assignPool, giftFromD100, giftRollCount, originFromD12, parseDiscordPool,
+  GIFT_CHOICE_FACE, GIFT_CHOICE_IDS, STANDARD_POOL, assignPool, giftFromD100, giftRollCount, originFromD22, parseDiscordPool,
   poolAttemptOptions, poolMatches,
 } from "../module/core/creation.mjs";
+import { GIFTS, ORIGINS, attributeSnapshots, catalogName, originMilestones, slayerMaxResources } from "../module/core/progression.mjs";
 import { ONI_LEVEL_GAINS, oniMaxResources } from "../module/core/oni.mjs";
 
-test("d100 Gift table boundaries (§4.2)", () => {
-  const cases = { 1: "sem_habilidade", 25: "sem_habilidade", 26: "tato_sensitivo", 47: "audicao_sobrenatural", 58: "visao_agucada",
-    69: "olfato_sobrenatural", 80: "metamorfose_carnivora", 81: "tsuyoi", 91: "tsuyoi", 92: "marechi", 98: "marechi", 99: "oketsu", 100: "marca_do_destino" };
-  for (const [n, id] of Object.entries(cases)) assert.equal(giftFromD100(n), id, `d100=${n}`);
-  assert.equal(giftFromD100(0), null);
+test("all d100 faces resolve to the approved Gift or the choice on 98", () => {
+  const ranges = [
+    [26, "sem_habilidade"], [36, "tato_sensitivo"], [37, "vanilla_tato_agucado"],
+    [47, "audicao_sobrenatural"], [48, "vanilla_audicao_agucada"],
+    [58, "visao_agucada"], [59, "vanilla_visao_agucada"],
+    [69, "olfato_sobrenatural"], [70, "vanilla_olfato_agucado"],
+    [80, "metamorfose_carnivora"], [81, "vanilla_transformacao_demoniaca"],
+    [91, "tsuyoi"], [97, "marechi"], [98, null], [99, "oketsu"], [100, "marca_do_destino"],
+  ];
+  let face = 1;
+  for (const [end, id] of ranges) {
+    for (; face <= end; face++) assert.equal(giftFromD100(face), id, `d100=${face}`);
+  }
+  assert.equal(GIFT_CHOICE_FACE, 98);
+  assert.deepEqual(GIFT_CHOICE_IDS, ["vanilla_marechi", "vanilla_transformacao_demoniaca"]);
+  for (const id of GIFT_CHOICE_IDS) assert.ok(GIFTS[id]?.effect);
+  for (const invalid of [0, 101, 1.5, NaN]) assert.equal(giftFromD100(invalid), null);
 });
 
 test("Gift rolls: 2, or 3 for Descendente Perdido / sangue antigo (§4.1)", () => {
@@ -19,11 +32,38 @@ test("Gift rolls: 2, or 3 for Descendente Perdido / sangue antigo (§4.1)", () =
   assert.equal(giftRollCount("origem_samurai", true), 3);
 });
 
-test("d12 → Origin (§3.2)", () => {
-  assert.equal(originFromD12(1), "origem_artista_marcial");
-  assert.equal(originFromD12(10), "origem_ninja");
-  assert.equal(originFromD12(12), "origem_tsuguko");
-  assert.equal(originFromD12(13), null);
+test("all d22 faces preserve the previous twelve Origins and the vanilla d10 weights", () => {
+  const expected = [
+    "origem_artista_marcial", "origem_civilizado", "origem_corsario", "origem_criado_ex_hashira",
+    "origem_descendente_perdido", "origem_estrangeiro", "origem_isolado", "origem_militar",
+    "origem_monge", "origem_ninja", "origem_samurai", "origem_tsuguko",
+    "vanilla_aldeao", "vanilla_aldeao", "vanilla_civilizado", "vanilla_civilizado",
+    "vanilla_criado_exterminador", "vanilla_criado_exterminador", "vanilla_isolado",
+    "vanilla_descendente", "vanilla_tsuguko", "vanilla_mestre_uma_coisa",
+  ];
+  assert.deepEqual(expected.map((_, i) => originFromD22(i + 1)), expected);
+  for (const invalid of [0, 23, 1.5, NaN]) assert.equal(originFromD22(invalid), null);
+});
+
+test("Mestre de Uma Coisa Só: PDV/PDR, Marechi and milestone availability", () => {
+  const origin = "vanilla_mestre_uma_coisa";
+  const snapshots = attributeSnapshots({ vit: 3, fdv: 2 });
+  assert.deepEqual(slayerMaxResources({ level: 1, origin, snapshots }), { pdv: 13, pdr: 5 });
+  assert.deepEqual(slayerMaxResources({ level: 2, origin, snapshots }), { pdv: 26, pdr: 8 });
+  assert.deepEqual(slayerMaxResources({ level: 1, origin, snapshots, gift: "vanilla_marechi" }), { pdv: 13, pdr: 6 });
+  assert.deepEqual(slayerMaxResources({ level: 2, origin, snapshots, gift: "vanilla_marechi" }), { pdv: 26, pdr: 10 });
+  const marks = originMilestones(ORIGINS[origin], 6);
+  assert.deepEqual(marks.map(({ level, unlocked }) => [level, unlocked]), [[1, true], [5, true], [6, true], [7, false], [9, false]]);
+  assert.equal(marks[0].name, "Especialista");
+  assert.equal(marks[2].name, "Fragmentado");
+});
+
+test("existing Tsuguko and Marechi IDs retain their original values even when roll faces overlap", () => {
+  const snapshots = attributeSnapshots({ vit: 3, fdv: 2 });
+  assert.deepEqual(slayerMaxResources({ level: 1, origin: "origem_tsuguko", snapshots, gift: "marechi" }), { pdv: 15, pdr: 19 });
+  assert.deepEqual(slayerMaxResources({ level: 1, origin: "vanilla_tsuguko", snapshots, gift: "vanilla_marechi" }), { pdv: 13, pdr: 6 });
+  assert.equal(catalogName("origem_tsuguko", ORIGINS.origem_tsuguko), "Tsuguko (autoral)");
+  assert.equal(catalogName("vanilla_tsuguko", ORIGINS.vanilla_tsuguko), "Tsuguko (vanilla)");
 });
 
 test("7d4 attempts: 1st use/reroll, 2nd use 1st or 2nd/reroll, 3rd mandatory (§1.2)", () => {

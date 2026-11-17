@@ -1,13 +1,14 @@
 /**
  * Level 0 → 1 creation wizard (plans/night-assassins-criacao-atributos-progressao.md §8, Caçador).
- * Steps: attributes (array / 7d4 ×3 / Discord) → Origin (1d12 with 2 chances, or a choice the GM allowed)
+ * Steps: attributes (array / 7d4 ×3 / Discord) → Origin (1d22 with 2 chances, or a choice the GM allowed)
  * → Blood Gift (2–3d100 keep highest, or a choice the GM allowed) → Breathing and weapon → summary.
  * Procedure ported from the legacy attribute-dialogs.mjs; rules live in module/core.
- * "2 chances" for the Origin is a table rule stated by the operator (the rule files only give the d12 table).
+ * "2 chances" for the Origin is a table rule stated by the operator.
  */
-import { ATTRIBUTE_IDS, GIFTS, ORIGINS, attributeSnapshots, folegoMax, slayerMaxResources } from "../core/progression.mjs";
+import { ATTRIBUTE_IDS, GIFTS, ORIGINS, attributeSnapshots, catalogName, folegoMax, slayerMaxResources } from "../core/progression.mjs";
 import {
-  MAX_POOL_ATTEMPTS, STANDARD_POOL, assignPool, giftFromD100, giftRollCount, originFromD12, parseDiscordPool,
+  CREATION_CATALOG_VERSION, GIFT_CHOICE_FACE, GIFT_CHOICE_IDS, MAX_POOL_ATTEMPTS, STANDARD_POOL,
+  assignPool, giftFromD100, giftRollCount, originFromD22, parseDiscordPool,
   poolAttemptOptions,
 } from "../core/creation.mjs";
 import { giftAttributeBonuses } from "../core/bonuses.mjs";
@@ -17,7 +18,7 @@ import { canChoose, chatNotice, rollToChat } from "./rolls.mjs";
 const { HandlebarsApplicationMixin, ApplicationV2, DialogV2 } = foundry.applications.api;
 
 const ATTR_LABELS = { vit: "VIT", dex: "DEX", for: "FOR", car: "CAR", fdv: "FDV", int: "INT", sab: "SAB" };
-const STEPS = ["Atributos", "Origem", "Dom do Sangue", "Respiração e arma", "Resumo"];
+const STEPS = ["Atributos", "Origem", "Habilidade Especial", "Respiração e arma", "Resumo"];
 const ORIGIN_CHANCES = 2;
 const EARLY_CLASSES = [
   { id: "classe_usuario_de_duas_resp", name: "Usuário de Duas Respirações" },
@@ -78,11 +79,17 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
       if (r.duplicated.length) return `Cada valor só pode ser usado uma vez (repetido em ${r.duplicated.map((a) => ATTR_LABELS[a]).join(", ")}).`;
       if (r.missing.length) return `Falta distribuir: ${r.missing.map((a) => ATTR_LABELS[a]).join(", ")}.`;
     }
-    if (s.step === 1 && !s.originId) return "Role a Origem (1d12, 2 chances) ou escolha, se o Mestre deixou.";
-    if (s.step === 2 && !s.gift) return "Role o Dom do Sangue ou escolha, se o Mestre deixou.";
+    if (s.step === 1 && !s.originId) return "Role a Origem (1d22, 2 chances) ou escolha, se o Mestre deixou.";
+    if (s.step === 2 && !s.gift) return this.#hasGiftChoice()
+      ? "O resultado 98 pede uma escolha: Marechi ou Transformação Demoníaca."
+      : "Role a Habilidade Especial ou escolha, se o Mestre deixou.";
     if (s.step === 2 && s.gift === "marca_do_destino" && !s.giftAttr) return "Marca do Destino: escolha o atributo que recebe o bônus.";
     if (s.step === 3 && !s.breathing) return "Escolha a Respiração Primária (com aprovação do Mestre).";
     return "";
+  }
+
+  #hasGiftChoice() {
+    return this.wiz.giftMethod === "rolado" && Math.max(...this.wiz.giftRolls) === GIFT_CHOICE_FACE;
   }
 
   async _prepareContext() {
@@ -127,20 +134,24 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
           }))
         : null,
       poolText: s.pool ? s.pool.join(" · ") : "",
-      origin: origin ? { ...origin, id: s.originId } : null,
+      origin: origin ? { ...origin, name: catalogName(s.originId, origin) } : null,
       originRolls: s.originRolls,
-      originCanRoll: originRollsLeft > 0 && s.originMethod !== "escolhida" && !s.busy,
-      originRollLabel: s.originRolls.length ? `Usar a 2ª chance (vale a 2ª)` : "Rolar 1d12",
+      originLocked: s.giftMethod === "rolado",
+      originCanRoll: originRollsLeft > 0 && s.originMethod !== "escolhida" && s.giftMethod !== "rolado" && !s.busy,
+      originRollLabel: s.originRolls.length ? "Usar a 2ª chance (vale a 2ª)" : "Rolar 1d22",
       originRollsLeft,
       originChoosable,
       originChoices: originChoosable
-        ? Object.entries(ORIGINS).map(([id, o]) => ({ id, name: `${o.d12}. ${o.name}`, selected: id === s.originId }))
+        ? Object.entries(ORIGINS).map(([id, o]) => ({ id, name: catalogName(id, o), selected: id === s.originId }))
         : null,
       giftDice: giftRollCount(s.originId, s.ancientBlood),
-      gift: s.gift ? { ...GIFTS[s.gift], id: s.gift } : null,
+      gift: s.gift ? { ...GIFTS[s.gift], name: catalogName(s.gift, GIFTS[s.gift]) } : null,
       giftChoosable,
       giftChoices: giftChoosable
-        ? Object.entries(GIFTS).map(([id, g]) => ({ id, name: `${g.range} · ${g.name}`, selected: id === s.gift }))
+        ? Object.entries(GIFTS).map(([id, g]) => ({ id, name: catalogName(id, g), selected: id === s.gift }))
+        : null,
+      rolledGiftChoices: this.#hasGiftChoice()
+        ? GIFT_CHOICE_IDS.map((id) => ({ id, name: catalogName(id, GIFTS[id]), selected: id === s.gift }))
         : null,
       needGiftAttr: s.gift === "marca_do_destino",
       giftAttrOptions: ATTRIBUTE_IDS.map((id) => ({ id, label: ATTR_LABELS[id], selected: id === s.giftAttr })),
@@ -165,11 +176,18 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
       if (out) { out.textContent = p.text; out.dataset.ok = String(p.ok); }
     });
     el.querySelector("select[name=originChoice]")?.addEventListener("change", (ev) => {
+      if (this.wiz.busy || this.wiz.giftMethod === "rolado") return;
       Object.assign(this.wiz, { originId: ev.target.value, originMethod: ev.target.value ? "escolhida" : "" });
       this.render();
     });
     el.querySelector("select[name=giftChoice]")?.addEventListener("change", (ev) => {
+      if (this.wiz.busy || this.wiz.giftMethod === "rolado") return;
       Object.assign(this.wiz, { gift: ev.target.value, giftMethod: ev.target.value ? "escolhido" : "", giftRolls: [] });
+      this.render();
+    });
+    el.querySelector("select[name=rolledGiftChoice]")?.addEventListener("change", (ev) => {
+      if (!this.#hasGiftChoice()) return;
+      this.wiz.gift = GIFT_CHOICE_IDS.includes(ev.target.value) ? ev.target.value : "";
       this.render();
     });
     el.querySelector("select[name=giftAttr]")?.addEventListener("change", (ev) => { this.wiz.giftAttr = ev.target.value; this.render(); });
@@ -227,17 +245,17 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
     this.render();
   }
 
-  /** 1d12, two chances: the second roll replaces the first and is final. */
+  /** 1d22, two chances: the second roll replaces the first and is final. */
   static async #onRollOrigin() {
     const s = this.wiz;
-    if (s.busy || s.originRolls.length >= ORIGIN_CHANCES) return;
+    if (s.busy || s.originMethod === "escolhida" || s.giftMethod === "rolado" || s.originRolls.length >= ORIGIN_CHANCES) return;
     s.busy = true;
     this.render();
     try {
       const n = s.originRolls.length + 1;
-      const roll = await rollToChat("1d12", this.actor, `Criação: Origem (1d12), ${n}ª chance${n === ORIGIN_CHANCES ? " (final)" : ""}`);
+      const roll = await rollToChat("1d22", this.actor, `Criação: Origem (1d22), ${n}ª chance${n === ORIGIN_CHANCES ? " (final)" : ""}`);
       s.originRolls.push(roll.total);
-      Object.assign(s, { originId: originFromD12(roll.total), originMethod: "rolada" });
+      Object.assign(s, { originId: originFromD22(roll.total), originMethod: "rolada" });
     } finally {
       s.busy = false;
       this.render();
@@ -265,8 +283,8 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
     this.render();
     try {
       const n = giftRollCount(s.originId, s.ancientBlood);
-      const roll = await rollToChat(`${n}d100kh`, this.actor, `Criação: Dom do Sangue (${n}d100, fica o maior)`);
-      Object.assign(s, { giftRolls: roll.dice[0].results.map((r) => Number(r.result)), gift: giftFromD100(roll.total), giftMethod: "rolado" });
+      const roll = await rollToChat(`${n}d100kh1`, this.actor, `Criação: Habilidade Especial (${n}d100, fica o maior)`);
+      Object.assign(s, { giftRolls: roll.dice[0].results.map((r) => Number(r.result)), gift: giftFromD100(roll.total) ?? "", giftMethod: "rolado" });
     } finally {
       s.busy = false;
       this.render();
@@ -274,6 +292,7 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
   }
 
   static async #onNext() {
+    if (this.wiz.busy) return;
     const err = this.#stepError();
     if (err) return ui.notifications.warn(err);
     this.wiz.step = Math.min(STEPS.length - 1, this.wiz.step + 1);
@@ -281,6 +300,7 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
   }
 
   static async #onBack() {
+    if (this.wiz.busy) return;
     this.wiz.step = Math.max(0, this.wiz.step - 1);
     this.render();
   }
@@ -288,7 +308,11 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
   static async #onFinish() {
     const s = this.wiz;
     const values = this.#values();
-    if (!values || !s.originId || !s.gift || !s.breathing) return ui.notifications.warn("Há etapas incompletas.");
+    if (s.busy) return;
+    if (!values || !Object.hasOwn(ORIGINS, s.originId) || !Object.hasOwn(GIFTS, s.gift) || !s.breathing
+      || (this.#hasGiftChoice() && !GIFT_CHOICE_IDS.includes(s.gift))) {
+      return ui.notifications.warn("Há etapas incompletas.");
+    }
     if (!this.actor.isOwner) return ui.notifications.error("Só o dono da ficha pode concluir a criação.");
     const origin = ORIGINS[s.originId];
     const gift = giftAttributeBonuses(s.gift, 1, s.giftAttr);
@@ -304,6 +328,7 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
       "system.proficientWeapon": s.weapon.trim(),
       "system.progression": { gain3: "", gain7: "", level14: "" },
       "system.creation": {
+        catalogVersion: CREATION_CATALOG_VERSION,
         method: s.method, pool: s.pool, originMethod: s.originMethod, originRoll: s.originRolls.at(-1) ?? null,
         originRolls: s.originRolls, giftMethod: s.giftMethod, giftRolls: s.giftRolls, ancientBlood: s.ancientBlood,
       },
@@ -313,10 +338,10 @@ export class SlayerCreationApp extends HandlebarsApplicationMixin(ApplicationV2)
     };
     if (s.earlyClass && EARLY_CLASSES.some((c) => c.id === s.earlyClass)) update["system.classId"] = s.earlyClass;
     await this.actor.update(update);
-    await chatNotice(this.actor, `<h3>${escapeHtml(this.actor.name)} criado (nível 1, Aspirante a Exterminador)</h3>
+    await chatNotice(this.actor, `<div class="nas-chat-card nas-chat-card--creation"><h3>${escapeHtml(this.actor.name)} criado <small>nível 1 · Aspirante a Exterminador</small></h3>
       <p><strong>Atributos:</strong> ${ATTRIBUTE_IDS.map((id) => `${ATTR_LABELS[id]} ${values[id]}`).join(" · ")}</p>
-      <p><strong>Origem:</strong> ${origin.name} (${METHOD_TEXT[s.originMethod]}${s.originRolls.length ? `, d12: ${s.originRolls.join(" → ")}` : ""}) · <strong>Dom:</strong> ${GIFTS[s.gift].name} (${METHOD_TEXT[s.giftMethod]})</p>
-      <p><strong>Respiração:</strong> ${escapeHtml(s.breathing)} · <strong>PDV</strong> ${max.pdv} · <strong>PDR</strong> ${max.pdr} · <strong>Fôlego</strong> ${folegoMax(permanent.fdv)}</p>`);
+      <p><strong>Origem:</strong> ${catalogName(s.originId, origin)} (${METHOD_TEXT[s.originMethod]}${s.originRolls.length ? `, d22: ${s.originRolls.join(" → ")}` : ""}) · <strong>Habilidade Especial:</strong> ${catalogName(s.gift, GIFTS[s.gift])} (${METHOD_TEXT[s.giftMethod]})</p>
+      <p><strong>Respiração:</strong> ${escapeHtml(s.breathing)} · <strong>PDV</strong> ${max.pdv} · <strong>PDR</strong> ${max.pdr} · <strong>Fôlego</strong> ${folegoMax(permanent.fdv)}</p></div>`);
     await this.close();
   }
 }
